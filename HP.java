@@ -26,15 +26,67 @@ enum H_Richtung {
 
 public class HP {
 
-    private ArrayList<Node> path;
-
     public static void main(String[] args) {
         HP hp = new HP();
     }
 
     public HP() {
-        this.path = new ArrayList<Node>();
-        // Random path
+        Population population = new Population();
+        population.createRandomPopulation();
+        population.createMazeFromPopulation();
+        population.printModel();
+    }
+}
+
+class Population {
+    private ArrayList<HPModell> hpModellPopulation;
+
+    public Population() {
+        this.hpModellPopulation = new ArrayList<HPModell>();
+    }
+
+    public void createRandomPopulation() {
+        for (int i = 0; i < 10; i++) {
+            HPModell hpModell = new HPModell();
+            hpModell.createRandomPopulation();
+            this.hpModellPopulation.add(hpModell);
+        }
+    }
+
+    public void printPopulation() {
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.printPopulation();
+        }
+    }
+
+    public void createMazeFromPopulation() {
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.createMazeFromPopulation();
+        }
+    }
+
+    public void printModel() {
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.printPopulation();
+            hpModell.printMaze();
+            hpModell.calcFitness();
+            System.out.println(hpModell.getFitness());
+        }
+    }
+
+}
+
+class HPModell {
+    private ArrayList<Node> proteins;
+    private int[][] maze = new int[20][20];
+    private int fitness;
+
+    public HPModell() {
+        this.proteins = new ArrayList<Node>();
+
+    }
+
+    public void createRandomPopulation() {
         Node lastNode = null;
         RelDir lastTwoDirections[] = new RelDir[2];
         for (int i = 0; i < 10; i++) {
@@ -46,35 +98,48 @@ public class HP {
                 System.out.println("Same direction -> get new direction");
                 direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
             }
-            this.path.add(new Node(null, direction, isHydrophobic));
-            if (lastNode != null) {
-                lastNode.setNextNode(this.path.get(i));
-            }
-            lastNode = this.path.get(i);
-        }
+            lastTwoDirections[0] = lastTwoDirections[1];
+            lastTwoDirections[1] = direction;
 
-        // Print path
-        Node currentNode = this.path.get(0);
+            this.proteins.add(new Node(null, direction, isHydrophobic));
+            if (lastNode != null) {
+                lastNode.setNextNode(this.proteins.get(i));
+            }
+            lastNode = this.proteins.get(i);
+        }
+    }
+
+    public void printPopulation() {
+        Node currentNode = this.proteins.get(0);
         while (currentNode != null) {
             System.out.println((currentNode.getIsHydrophobic() ? "H" : "P")
                     + " " + currentNode.getDirection());
             currentNode = currentNode.getNextNode();
         }
+    }
 
-        // Create maze from path
-        int[][] maze = new int[20][20];
-        currentNode = this.path.get(0);
+    public void createMazeFromPopulation() {
         int x = 10;
         int y = 10;
-        boolean isTheFirst = true;
+        maze = new int[20][20];
+        Node currentNode = this.proteins.get(0);
 
-        H_Richtung lastH_Richtung = H_Richtung.Nord;
-        // RelDir last = currentNode.getDirection();
+        H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
+
+        List<Node> nodes = new ArrayList<Node>(); // To check overlapping
 
         while (currentNode != null) {
-            maze[x][y] = isTheFirst ? currentNode.getIsHydrophobic() ? -1 : -2
-                    : currentNode.getIsHydrophobic() ? 1 : 2;
-            isTheFirst = false;
+            // Check overlapping
+            for (Node node : nodes) {
+                if (node.getX() == x && node.getY() == y) {
+                    System.out.println("Overlapping");
+                    return;
+                }
+            }
+            maze[x][y] = currentNode.getIsHydrophobic() ? TempNodeType.Hydro.getValue() : TempNodeType.Polar.getValue();
+            currentNode.setX(x);
+            currentNode.setY(y);
+            nodes.add(currentNode);
 
             int initRichtung = lastH_Richtung.ordinal();
             int relRichtung = currentNode.getDirection().getValue();
@@ -96,36 +161,78 @@ public class HP {
                     y--;
                     break;
             }
+
             currentNode = currentNode.getNextNode();
             continue;
 
         }
+    }
 
-        // print maze
-        for (
+    public void calcFitness() {
+        Node currentNode = this.proteins.get(0);
+        int lastX, lastY;
+        lastX = currentNode.getX();
+        lastY = currentNode.getY();
+        this.fitness = 0;
+        while (currentNode != null) {
+            if (currentNode.getIsHydrophobic()) {
+                // Check if left, right, up or down is hydrophobic (without the cords from the
+                // last node)
 
-                int i = 0; i < maze.length; i++) {
+                if (maze[currentNode.getX() - 1][currentNode.getY()] == TempNodeType.Hydro.getValue()) {
+                    if (currentNode.getX() - 1 != lastX && currentNode.getY() != lastY) {
+                        fitness--;
+                    }
+                } else if (maze[currentNode.getX() + 1][currentNode.getY()] == TempNodeType.Hydro.getValue()) {
+                    if (currentNode.getX() + 1 != lastX && currentNode.getY() != lastY) {
+                        fitness--;
+                    }
+                } else if (maze[currentNode.getX()][currentNode.getY() - 1] == TempNodeType.Hydro.getValue()) {
+                    if (currentNode.getX() != lastX && currentNode.getY() - 1 != lastY) {
+                        fitness--;
+                    }
+                } else if (maze[currentNode.getX()][currentNode.getY() + 1] == TempNodeType.Hydro.getValue()) {
+                    if (currentNode.getX() != lastX && currentNode.getY() + 1 != lastY) {
+                        fitness--;
+                    }
+                }
+            }
+            lastX = currentNode.getX();
+            lastY = currentNode.getY();
+            currentNode = currentNode.getNextNode();
+        }
+
+    }
+
+    public int getFitness() {
+        return this.fitness;
+    }
+
+    public void printMaze() {
+        for (int i = 0; i < maze.length; i++) {
             System.out.print("|");
             for (int j = 0; j < maze[i].length; j++) {
-                System.out.print(maze[i][j] == 0 ? " "
-                        : maze[i][j] == -1 ? "Q"
-                                : maze[i][j] == -2 ? "R"
-                                        : maze[i][j] == 1 ? "H" : "P");
+                System.out.print(maze[i][j] == TempNodeType.Hydro.getValue() ? "H "
+                        : maze[i][j] == TempNodeType.Polar.getValue() ? "P "
+                                : "  ");
                 System.out.print("|");
             }
             System.out.println();
         }
-        // Print maze formatted
-        // for (int i = 0; i < maze.length; i++) {
-        // System.out.print("|");
-        // for (int j = 0; j < maze[i].length; j++) {
-        // System.out.print(maze[i][j] == 0 ? " " : maze[i][j] == -1 ? "S" : maze[i][j]
-        // == 1 ? "H" : "P");
-        // System.out.print("|");
-        // }
-        // System.out.println();
-        // }
+    }
+}
 
+enum TempNodeType {
+    Hydro(3), Polar(4);
+
+    public final int value;
+
+    private TempNodeType(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }
 
@@ -133,6 +240,7 @@ class Node {
     private Node nextNode;
     private RelDir direction;
     private boolean isHydrophobic;
+    private int x, y;
 
     public Node(Node nextNode, RelDir direction, boolean isHydrophobic) {
         this.nextNode = nextNode;
@@ -150,6 +258,22 @@ class Node {
 
     public boolean getIsHydrophobic() {
         return this.isHydrophobic;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public void setNextNode(Node nextNode) {
