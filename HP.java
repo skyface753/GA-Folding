@@ -32,9 +32,13 @@ public class HP {
 
     public HP() {
         Population population = new Population();
-        population.createRandomPopulation();
+        population.creatTestPop();
+        // population.printPopulation();
         population.createMazeFromPopulation();
         population.printModel();
+        // population.createRandomPopulation();
+        // population.createMazeFromPopulation();
+        // population.printModel();
     }
 }
 
@@ -43,6 +47,20 @@ class Population {
 
     public Population() {
         this.hpModellPopulation = new ArrayList<HPModell>();
+    }
+
+    public void creatTestPop() {
+        String[] sequenzes = { "HFPRPRHFPRHF", // Own Example
+                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1
+                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2
+                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1
+                "HFPLHLHFPRPRPRHF" // GAP00 Praktikum Faltung 2
+        };
+        for (String sequenz : sequenzes) {
+            HPModell hpModell = new HPModell();
+            hpModell.createFromSequenz(sequenz);
+            this.hpModellPopulation.add(hpModell);
+        }
     }
 
     public void createRandomPopulation() {
@@ -84,6 +102,65 @@ class HPModell {
     public HPModell() {
         this.proteins = new ArrayList<Node>();
 
+    }
+
+    public void createTestModell1() {
+
+        // Create list HPHPPHPPHP with Directions LFRRFLFFRF
+        RelDir[] directions = { RelDir.Left, RelDir.Forward, RelDir.Right, RelDir.Right, RelDir.Forward, RelDir.Left,
+                RelDir.Forward, RelDir.Forward, RelDir.Right, RelDir.Forward };
+        boolean[] isHydrophobic = { true, false, false, true, true, false, false, true, false, true };
+        Node lastNode = null;
+        for (int i = 0; i < directions.length; i++) {
+            this.proteins.add(new Node(null, directions[i], isHydrophobic[i]));
+            if (lastNode != null) {
+                lastNode.setNextNode(this.proteins.get(i));
+            }
+            lastNode = this.proteins.get(i);
+        }
+    }
+
+    public void createTestModell2() {
+        // FRFRRLLRFLRLRLLRRFRF
+        RelDir[] directions = { RelDir.Forward, RelDir.Right, RelDir.Forward, RelDir.Right, RelDir.Right, RelDir.Left,
+                RelDir.Left, RelDir.Right, RelDir.Forward, RelDir.Left, RelDir.Right, RelDir.Left, RelDir.Right,
+                RelDir.Left, RelDir.Left, RelDir.Right, RelDir.Right, RelDir.Forward, RelDir.Right, RelDir.Forward };
+        // HPHPPHHPHPPHPHHPPHPH
+        boolean[] isHydrophobic = { true, false, true, false, false, true, true, false, true, false, false, true,
+                false, true, true, false, false, true, false, true };
+        Node lastNode = null;
+        for (int i = 0; i < directions.length; i++) {
+            this.proteins.add(new Node(null, directions[i], isHydrophobic[i]));
+            if (lastNode != null) {
+                lastNode.setNextNode(this.proteins.get(i));
+            }
+            lastNode = this.proteins.get(i);
+        }
+    }
+
+    public void createFromSequenz(String sequenz) {
+        Node lastNode = null;
+        for (int i = 0; i < sequenz.length(); i = i + 2) {
+            boolean isHydrophobic = sequenz.charAt(i) == 'H';
+            RelDir direction = null;
+            switch (sequenz.charAt(i + 1)) {
+                case 'L':
+                    direction = RelDir.Left;
+                    break;
+                case 'F':
+                    direction = RelDir.Forward;
+                    break;
+                case 'R':
+                    direction = RelDir.Right;
+                    break;
+            }
+            this.proteins.add(new Node(null, direction, isHydrophobic));
+            if (lastNode != null) {
+                lastNode.setNextNode(this.proteins.get(i / 2));
+            }
+            lastNode = this.proteins.get(i / 2);
+
+        }
     }
 
     public void createRandomPopulation() {
@@ -169,37 +246,112 @@ class HPModell {
     }
 
     public void calcFitness() {
-        Node currentNode = this.proteins.get(0);
-        int lastX, lastY;
-        lastX = currentNode.getX();
-        lastY = currentNode.getY();
+        // Node currentNode = this.proteins.get(0);
+        // int lastX, lastY;
+        // lastX = currentNode.getX();
+        // lastY = currentNode.getY();
+
+        // while (currentNode != null) {
+
+        // if (firstThree <= 0 && currentNode.getIsHydrophobic()) {
+        // // Check if left, right, up or down is hydrophobic (without the cords from
+        // the
+        // // last node)
+        // int left = maze[currentNode.getX()][currentNode.getY() - 1];
+        // int right = maze[currentNode.getX()][currentNode.getY() + 1];
+        // int up = maze[currentNode.getX() - 1][currentNode.getY()];
+        // int down = maze[currentNode.getX() + 1][currentNode.getY()];
+        // // TODO: Does not work
+        // if (left == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() - 1)
+        // {
+        // this.fitness--;
+        // }
+        // if (right == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() +
+        // 1) {
+        // this.fitness--;
+        // }
+        // if (up == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() - 1) {
+        // this.fitness--;
+        // }
+        // if (down == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() + 1)
+        // {
+        // this.fitness--;
+        // }
+
+        // }
+        // firstThree--;
+
+        // lastX = currentNode.getX();
+        // lastY = currentNode.getY();
+        // currentNode = currentNode.getNextNode();
+        // }
         this.fitness = 0;
+        int firstThree = 3;
+        int x = 10;
+        int y = 10;
+        maze = new int[20][20];
+        Node currentNode = this.proteins.get(0);
+        int lastX = currentNode.getX();
+        int lastY = currentNode.getY();
+
+        H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
+
         while (currentNode != null) {
-            if (currentNode.getIsHydrophobic()) {
+
+            maze[x][y] = currentNode.getIsHydrophobic() ? TempNodeType.Hydro.getValue() : TempNodeType.Polar.getValue();
+            currentNode.setX(x);
+            currentNode.setY(y);
+
+            int initRichtung = lastH_Richtung.ordinal();
+            int relRichtung = currentNode.getDirection().getValue();
+            int intFromEnums = initRichtung + relRichtung;
+            int intFromEnumsMod = intFromEnums % 4;
+            lastH_Richtung = H_Richtung.values()[intFromEnumsMod < 0 ? intFromEnumsMod + 4 : intFromEnumsMod];
+
+            if (firstThree <= 0 && currentNode.getIsHydrophobic()) {
                 // Check if left, right, up or down is hydrophobic (without the cords from the
                 // last node)
+                int left = maze[currentNode.getX()][currentNode.getY() - 1];
+                int right = maze[currentNode.getX()][currentNode.getY() + 1];
+                int up = maze[currentNode.getX() - 1][currentNode.getY()];
+                int down = maze[currentNode.getX() + 1][currentNode.getY()];
 
-                if (maze[currentNode.getX() - 1][currentNode.getY()] == TempNodeType.Hydro.getValue()) {
-                    if (currentNode.getX() - 1 != lastX && currentNode.getY() != lastY) {
-                        fitness--;
-                    }
-                } else if (maze[currentNode.getX() + 1][currentNode.getY()] == TempNodeType.Hydro.getValue()) {
-                    if (currentNode.getX() + 1 != lastX && currentNode.getY() != lastY) {
-                        fitness--;
-                    }
-                } else if (maze[currentNode.getX()][currentNode.getY() - 1] == TempNodeType.Hydro.getValue()) {
-                    if (currentNode.getX() != lastX && currentNode.getY() - 1 != lastY) {
-                        fitness--;
-                    }
-                } else if (maze[currentNode.getX()][currentNode.getY() + 1] == TempNodeType.Hydro.getValue()) {
-                    if (currentNode.getX() != lastX && currentNode.getY() + 1 != lastY) {
-                        fitness--;
-                    }
+                if (left == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() - 1) {
+                    this.fitness--;
+                }
+                if (right == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() + 1) {
+                    this.fitness--;
+                }
+                if (up == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() - 1) {
+                    this.fitness--;
+                }
+                if (down == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() + 1) {
+                    this.fitness--;
                 }
             }
+
+            // Update x and y
+            switch (lastH_Richtung) {
+                case Nord:
+                    x--;
+                    break;
+                case Ost:
+                    y++;
+                    break;
+                case Sued:
+                    x++;
+                    break;
+                case West:
+                    y--;
+                    break;
+            }
+
             lastX = currentNode.getX();
             lastY = currentNode.getY();
             currentNode = currentNode.getNextNode();
+            firstThree--;
+            continue;
+
         }
 
     }
