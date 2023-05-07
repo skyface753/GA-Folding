@@ -25,20 +25,22 @@ enum H_Richtung {
 };
 
 public class HP {
+    Population population;
 
     public static void main(String[] args) {
         HP hp = new HP();
+        hp.test();
     }
 
     public HP() {
-        Population population = new Population();
+        population = new Population();
+
+    }
+
+    public void test() {
         population.creatTestPop();
-        // population.printPopulation();
         population.createMazeFromPopulation();
         population.printModel();
-        // population.createRandomPopulation();
-        // population.createMazeFromPopulation();
-        // population.printModel();
     }
 }
 
@@ -102,40 +104,6 @@ class HPModell {
     public HPModell() {
         this.proteins = new ArrayList<Node>();
 
-    }
-
-    public void createTestModell1() {
-
-        // Create list HPHPPHPPHP with Directions LFRRFLFFRF
-        RelDir[] directions = { RelDir.Left, RelDir.Forward, RelDir.Right, RelDir.Right, RelDir.Forward, RelDir.Left,
-                RelDir.Forward, RelDir.Forward, RelDir.Right, RelDir.Forward };
-        boolean[] isHydrophobic = { true, false, false, true, true, false, false, true, false, true };
-        Node lastNode = null;
-        for (int i = 0; i < directions.length; i++) {
-            this.proteins.add(new Node(null, directions[i], isHydrophobic[i]));
-            if (lastNode != null) {
-                lastNode.setNextNode(this.proteins.get(i));
-            }
-            lastNode = this.proteins.get(i);
-        }
-    }
-
-    public void createTestModell2() {
-        // FRFRRLLRFLRLRLLRRFRF
-        RelDir[] directions = { RelDir.Forward, RelDir.Right, RelDir.Forward, RelDir.Right, RelDir.Right, RelDir.Left,
-                RelDir.Left, RelDir.Right, RelDir.Forward, RelDir.Left, RelDir.Right, RelDir.Left, RelDir.Right,
-                RelDir.Left, RelDir.Left, RelDir.Right, RelDir.Right, RelDir.Forward, RelDir.Right, RelDir.Forward };
-        // HPHPPHHPHPPHPHHPPHPH
-        boolean[] isHydrophobic = { true, false, true, false, false, true, true, false, true, false, false, true,
-                false, true, true, false, false, true, false, true };
-        Node lastNode = null;
-        for (int i = 0; i < directions.length; i++) {
-            this.proteins.add(new Node(null, directions[i], isHydrophobic[i]));
-            if (lastNode != null) {
-                lastNode.setNextNode(this.proteins.get(i));
-            }
-            lastNode = this.proteins.get(i);
-        }
     }
 
     public void createFromSequenz(String sequenz) {
@@ -246,45 +214,7 @@ class HPModell {
     }
 
     public void calcFitness() {
-        // Node currentNode = this.proteins.get(0);
-        // int lastX, lastY;
-        // lastX = currentNode.getX();
-        // lastY = currentNode.getY();
 
-        // while (currentNode != null) {
-
-        // if (firstThree <= 0 && currentNode.getIsHydrophobic()) {
-        // // Check if left, right, up or down is hydrophobic (without the cords from
-        // the
-        // // last node)
-        // int left = maze[currentNode.getX()][currentNode.getY() - 1];
-        // int right = maze[currentNode.getX()][currentNode.getY() + 1];
-        // int up = maze[currentNode.getX() - 1][currentNode.getY()];
-        // int down = maze[currentNode.getX() + 1][currentNode.getY()];
-        // // TODO: Does not work
-        // if (left == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() - 1)
-        // {
-        // this.fitness--;
-        // }
-        // if (right == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() +
-        // 1) {
-        // this.fitness--;
-        // }
-        // if (up == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() - 1) {
-        // this.fitness--;
-        // }
-        // if (down == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() + 1)
-        // {
-        // this.fitness--;
-        // }
-
-        // }
-        // firstThree--;
-
-        // lastX = currentNode.getX();
-        // lastY = currentNode.getY();
-        // currentNode = currentNode.getNextNode();
-        // }
         this.fitness = 0;
         int firstThree = 3;
         int x = 10;
