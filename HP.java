@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * HP
@@ -157,23 +157,17 @@ class HPModell {
         int x = 10;
         int y = 10;
         maze = new int[20][20];
+        for (int i = 0; i < 20; i++) {
+            Arrays.fill(maze[i], -1);
+        }
 
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
 
-        List<Node> nodes = new ArrayList<Node>(); // To check overlapping
-
         for (Node currentNode : this.proteins) {
-            // Check overlapping
-            for (Node node : nodes) {
-                if (node.getX() == x && node.getY() == y) {
-                    System.out.println("Overlapping");
-                    return;
-                }
-            }
-            maze[x][y] = currentNode.getIsHydrophobic() ? TempNodeType.Hydro.getValue() : TempNodeType.Polar.getValue();
+
+            maze[x][y] = currentNode.getIsHydrophobic() ? 1 : 0;
             currentNode.setX(x);
             currentNode.setY(y);
-            nodes.add(currentNode);
 
             int initRichtung = lastH_Richtung.ordinal();
             int relRichtung = currentNode.getDirection().getValue();
@@ -208,6 +202,9 @@ class HPModell {
         int x = 10;
         int y = 10;
         maze = new int[20][20];
+        for (int i = 0; i < 20; i++) {
+            Arrays.fill(maze[i], -1);
+        }
         int lastX = x;
         int lastY = y;
 
@@ -215,7 +212,7 @@ class HPModell {
 
         for (Node currentNode : this.proteins) {
 
-            maze[x][y] = currentNode.getIsHydrophobic() ? TempNodeType.Hydro.getValue() : TempNodeType.Polar.getValue();
+            maze[x][y] = currentNode.getIsHydrophobic() ? 1 : 0;
             currentNode.setX(x);
             currentNode.setY(y);
 
@@ -233,16 +230,16 @@ class HPModell {
                 int up = maze[currentNode.getX() - 1][currentNode.getY()];
                 int down = maze[currentNode.getX() + 1][currentNode.getY()];
 
-                if (left == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() - 1) {
+                if (left == 1 && lastY != currentNode.getY() - 1) {
                     this.fitness--;
                 }
-                if (right == TempNodeType.Hydro.getValue() && lastY != currentNode.getY() + 1) {
+                if (right == 1 && lastY != currentNode.getY() + 1) {
                     this.fitness--;
                 }
-                if (up == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() - 1) {
+                if (up == 1 && lastX != currentNode.getX() - 1) {
                     this.fitness--;
                 }
-                if (down == TempNodeType.Hydro.getValue() && lastX != currentNode.getX() + 1) {
+                if (down == 1 && lastX != currentNode.getX() + 1) {
                     this.fitness--;
                 }
             }
@@ -280,8 +277,8 @@ class HPModell {
         for (int i = 0; i < maze.length; i++) {
             System.out.print("|");
             for (int j = 0; j < maze[i].length; j++) {
-                System.out.print(maze[i][j] == TempNodeType.Hydro.getValue() ? "H "
-                        : maze[i][j] == TempNodeType.Polar.getValue() ? "P "
+                System.out.print(maze[i][j] == 1 ? "H "
+                        : maze[i][j] == 0 ? "P "
                                 : "  ");
                 System.out.print("|");
             }
@@ -290,19 +287,22 @@ class HPModell {
     }
 }
 
-enum TempNodeType {
-    Hydro(3), Polar(4);
+// 0 = hydrophil, "white"
+// 1 = hydrophob, "black"
 
-    public final int value;
+// enum TempNodeType {
+// Hydro(3), Polar(4);
 
-    private TempNodeType(int value) {
-        this.value = value;
-    }
+// public final int value;
 
-    public int getValue() {
-        return this.value;
-    }
-}
+// private TempNodeType(int value) {
+// this.value = value;
+// }
+
+// public int getValue() {
+// return this.value;
+// }
+// }
 
 class Node {
     // private Node nextNode;
