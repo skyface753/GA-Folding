@@ -52,11 +52,12 @@ class Population {
     }
 
     public void creatTestPop() {
-        String[] sequenzes = { "HFPRPRHFPRHF", // Own Example
-                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1
-                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2
-                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1
-                "HFPLHLHFPRPRPRHF" // GAP00 Praktikum Faltung 2
+        String[] sequenzes = { "HFPRPRHFPRHF", // Own Example = -2
+                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4
+                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9
+                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -3
+                "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -2
+                "PFPRPRPR" // Test = 0
         };
         for (String sequenz : sequenzes) {
             HPModell hpModell = new HPModell();
@@ -107,7 +108,6 @@ class HPModell {
     }
 
     public void createFromSequenz(String sequenz) {
-        Node lastNode = null;
         for (int i = 0; i < sequenz.length(); i = i + 2) {
             boolean isHydrophobic = sequenz.charAt(i) == 'H';
             RelDir direction = null;
@@ -122,17 +122,12 @@ class HPModell {
                     direction = RelDir.Right;
                     break;
             }
-            this.proteins.add(new Node(null, direction, isHydrophobic));
-            if (lastNode != null) {
-                lastNode.setNextNode(this.proteins.get(i / 2));
-            }
-            lastNode = this.proteins.get(i / 2);
-
+            this.proteins.add(new Node(direction, isHydrophobic));
         }
     }
 
     public void createRandomPopulation() {
-        Node lastNode = null;
+        // Node lastNode = null;
         RelDir lastTwoDirections[] = new RelDir[2];
         for (int i = 0; i < 10; i++) {
             boolean isHydrophobic = Math.random() < 0.5;
@@ -146,20 +141,15 @@ class HPModell {
             lastTwoDirections[0] = lastTwoDirections[1];
             lastTwoDirections[1] = direction;
 
-            this.proteins.add(new Node(null, direction, isHydrophobic));
-            if (lastNode != null) {
-                lastNode.setNextNode(this.proteins.get(i));
-            }
-            lastNode = this.proteins.get(i);
+            this.proteins.add(new Node(direction, isHydrophobic));
+
         }
     }
 
     public void printPopulation() {
-        Node currentNode = this.proteins.get(0);
-        while (currentNode != null) {
-            System.out.println((currentNode.getIsHydrophobic() ? "H" : "P")
-                    + " " + currentNode.getDirection());
-            currentNode = currentNode.getNextNode();
+        for (Node node : this.proteins) {
+            System.out.println((node.getIsHydrophobic() ? "H" : "P")
+                    + " " + node.getDirection());
         }
     }
 
@@ -167,13 +157,12 @@ class HPModell {
         int x = 10;
         int y = 10;
         maze = new int[20][20];
-        Node currentNode = this.proteins.get(0);
 
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
 
         List<Node> nodes = new ArrayList<Node>(); // To check overlapping
 
-        while (currentNode != null) {
+        for (Node currentNode : this.proteins) {
             // Check overlapping
             for (Node node : nodes) {
                 if (node.getX() == x && node.getY() == y) {
@@ -207,7 +196,6 @@ class HPModell {
                     break;
             }
 
-            currentNode = currentNode.getNextNode();
             continue;
 
         }
@@ -220,13 +208,12 @@ class HPModell {
         int x = 10;
         int y = 10;
         maze = new int[20][20];
-        Node currentNode = this.proteins.get(0);
-        int lastX = currentNode.getX();
-        int lastY = currentNode.getY();
+        int lastX = x;
+        int lastY = y;
 
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
 
-        while (currentNode != null) {
+        for (Node currentNode : this.proteins) {
 
             maze[x][y] = currentNode.getIsHydrophobic() ? TempNodeType.Hydro.getValue() : TempNodeType.Polar.getValue();
             currentNode.setX(x);
@@ -278,7 +265,6 @@ class HPModell {
 
             lastX = currentNode.getX();
             lastY = currentNode.getY();
-            currentNode = currentNode.getNextNode();
             firstThree--;
             continue;
 
@@ -319,19 +305,14 @@ enum TempNodeType {
 }
 
 class Node {
-    private Node nextNode;
+    // private Node nextNode;
     private RelDir direction;
     private boolean isHydrophobic;
     private int x, y;
 
-    public Node(Node nextNode, RelDir direction, boolean isHydrophobic) {
-        this.nextNode = nextNode;
+    public Node(RelDir direction, boolean isHydrophobic) {
         this.direction = direction;
         this.isHydrophobic = isHydrophobic;
-    }
-
-    public Node getNextNode() {
-        return this.nextNode;
     }
 
     public RelDir getDirection() {
@@ -358,9 +339,9 @@ class Node {
         this.y = y;
     }
 
-    public void setNextNode(Node nextNode) {
-        this.nextNode = nextNode;
-    }
+    // public void setNextNode(Node nextNode) {
+    // this.nextNode = nextNode;
+    // }
 
     public void setDirection(RelDir direction) {
         this.direction = direction;
