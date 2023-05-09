@@ -6,7 +6,7 @@ import java.util.Arrays;
  * https://arxiv.org/pdf/1608.05855.pdf
  * https://www.sciencedirect.com/science/article/pii/S147692711000040X
  */
-enum RelDir {
+enum RelDir { // Relative directions
     Left(-1), Forward(0), Right(1);
 
     public final int value;
@@ -20,7 +20,7 @@ enum RelDir {
     }
 }
 
-enum H_Richtung {
+enum H_Richtung { // Absolute directions -> For moving in the maze
     Nord, Ost, Sued, West
 };
 
@@ -88,7 +88,7 @@ class Population {
 
     public void printModel() {
         for (HPModell hpModell : this.hpModellPopulation) {
-            hpModell.printPopulation();
+            // hpModell.printPopulation();
             hpModell.printMaze();
             hpModell.calcFitness();
             System.out.println(hpModell.getFitness());
