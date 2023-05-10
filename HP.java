@@ -84,11 +84,13 @@ class Population {
     public void printModel() {
         for (HPModell hpModell : this.hpModellPopulation) {
             // hpModell.printPopulation();
-            hpModell.printOverlappingMaze();
+            // hpModell.printOverlappingMaze();
+            hpModell.printPopulation();
             hpModell.calcFitness();
             System.out.println("HydroContacts: " + hpModell.getHydroContacts());
             System.out.println("Overlaps: " + hpModell.getOverlaps());
             System.out.println("Fitness: " + hpModell.getFitness());
+            System.out.println();
         }
     }
 
@@ -146,16 +148,18 @@ class HPModell {
 
     public void printPopulation() {
         for (Node node : this.proteins) {
-            System.out.println((node.getIsHydrophobic() ? "H" : "P")
-                    + " " + node.getDirection());
+            System.out.print((node.getIsHydrophobic() ? "H" : "P")
+                    + (node.getDirection().toString()).substring(0, 1) + " ");
         }
+        System.out.println();
     }
 
     private int[][] createOverlappingMaze() {
-        int x = 10;
-        int y = 10;
-        int maze[][] = new int[20][20];
-        for (int i = 0; i < 20; i++) {
+        int anzProteins = this.proteins.size();
+        int x = anzProteins;
+        int y = anzProteins;
+        int maze[][] = new int[x * 2][y * 2];
+        for (int i = 0; i < x * 2; i++) {
             Arrays.fill(maze[i], 0);
         }
 
