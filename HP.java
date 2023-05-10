@@ -227,7 +227,7 @@ class HPModell {
             lastH_Richtung = H_Richtung.values()[intFromEnumsMod < 0 ? intFromEnumsMod + 4 : intFromEnumsMod];
 
             if (firstThree <= 0) { // Less than 3 nodes => No hydrophobic contacts and no overlaps
-                for (int j = 0; j < i - 1; j++) // j < i-1 => Excludes self and last
+                for (int j = 0; j < i - 2; j++) // j < i-1 => Excludes self and last
                 {
                     Node otherNode = this.proteins.get(j);
                     int otherX = otherNode.getX();
