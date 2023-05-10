@@ -1,5 +1,17 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.io.File;
+import java.io.IOException;
+import java.awt.Stroke;
+import java.awt.BasicStroke;
+
+import javax.imageio.ImageIO;
 
 /**
  * HP
@@ -40,6 +52,7 @@ public class HP {
     public void test() {
         population.creatTestPop();
         population.printModel();
+        population.allToImages();
     }
 }
 
@@ -91,6 +104,12 @@ class Population {
             System.out.println("Overlaps: " + hpModell.getOverlaps());
             System.out.println("Fitness: " + hpModell.getFitness());
             System.out.println();
+        }
+    }
+
+    public void allToImages() {
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.createBufferedImage();
         }
     }
 
@@ -152,6 +171,15 @@ class HPModell {
                     + (node.getDirection().toString()).substring(0, 1) + " ");
         }
         System.out.println();
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for (Node node : this.proteins) {
+            result += (node.getIsHydrophobic() ? "H" : "P") + (node.getDirection().toString()).substring(0, 1);
+        }
+        return result;
     }
 
     private int[][] createOverlappingMaze() {
@@ -304,6 +332,97 @@ class HPModell {
                 System.out.print("|");
             }
             System.out.println();
+        }
+    }
+
+    private void paintBorder(Graphics2D g, int x, int y, int width, int height) {
+        Color oldColor = g.getColor();
+
+        float thickness = 3;
+        g.setColor(Color.BLACK);
+        // top
+        g.setStroke(new BasicStroke(thickness));
+        g.drawLine(x, y, x + width, y);
+        // bottom
+        g.drawLine(x, y + height, x + width, y + height);
+        // right
+        g.drawLine(x + width, y, x + width, y + height);
+        // left
+        g.drawLine(x, y, x, y + height);
+        g.setColor(oldColor);
+    }
+
+    public void createBufferedImage() {
+        int height = 1000;
+        int width = 1000;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0, width, height);
+
+        int cellSize = 50;
+        int x = 500;
+        int y = 500;
+        H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
+        for (int i = 0; i < this.proteins.size(); i++) {
+            Node currentNode = this.proteins.get(i);
+            int initRichtung = lastH_Richtung.ordinal();
+            int relRichtung = currentNode.getDirection().getValue();
+            int intFromEnums = initRichtung + relRichtung;
+            int intFromEnumsMod = intFromEnums % 4;
+            lastH_Richtung = H_Richtung.values()[intFromEnumsMod < 0 ? intFromEnumsMod + 4 : intFromEnumsMod];
+
+            if (currentNode.getIsHydrophobic()) {
+                g2.setColor(Color.BLACK);
+            } else {
+                g2.setColor(Color.WHITE);
+            }
+            paintBorder(g2, x, y, cellSize, cellSize);
+            g2.fillRect(x, y, cellSize, cellSize);
+            String label = Integer.toString(i);
+            Font font = new Font("Serif", Font.PLAIN, 20);
+            g2.setFont(font);
+            FontMetrics metrics = g2.getFontMetrics(font);
+            int ascent = metrics.getAscent();
+            int labelWidth = metrics.stringWidth(label);
+            g2.setColor(Color.BLUE);
+            g2.drawString(label, x + (cellSize - labelWidth) / 2, y + (cellSize + ascent) / 2);
+
+            // Update x and y
+            g2.setColor(Color.RED);
+
+            switch (lastH_Richtung) {
+                case Nord:
+                    g2.drawLine(x + cellSize / 2, y, x + cellSize / 2, y - cellSize);
+                    y -= (cellSize * 2);
+                    break;
+                case Ost:
+                    g2.drawLine(x + cellSize, y + cellSize / 2, x + cellSize * 2, y + cellSize / 2);
+                    x += (cellSize * 2);
+                    break;
+                case Sued:
+                    g2.drawLine(x + cellSize / 2, y + cellSize, x + cellSize / 2, y + cellSize * 2);
+                    y += (cellSize * 2);
+                    break;
+                case West:
+                    g2.drawLine(x, y + cellSize / 2, x - cellSize, y + cellSize / 2);
+                    x -= (cellSize * 2);
+                    break;
+            }
+        }
+
+        String folder = "/tmp/alex/ga";
+        String filename = this.toString() + ".png";
+        if (new File(folder).exists() == false)
+            new File(folder).mkdirs();
+
+        try {
+            ImageIO.write(image, "png", new File(folder + File.separator + filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
         }
     }
 }
