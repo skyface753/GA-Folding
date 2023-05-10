@@ -52,12 +52,12 @@ class Population {
     }
 
     public void creatTestPop() {
-        String[] sequenzes = { "HFPRPRHFPRHF", // Own Example = -2
-                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4
-                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9
-                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -3
-                "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -2
-                "PFPRPRPR" // Test = 0
+        String[] sequenzes = { "HFPRPRHFPRHF", // Own Example = -2; 0 Overlaps
+                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4; 0 Overlaps
+                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9; 0 Overlaps
+                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -3; 0 Overlaps
+                "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -2; 1 Overlap
+                "PFPRPRPR" // Test = 0; 0 Overlaps
         };
         for (String sequenz : sequenzes) {
             HPModell hpModell = new HPModell();
@@ -91,7 +91,9 @@ class Population {
             // hpModell.printPopulation();
             hpModell.printMaze();
             hpModell.calcFitness();
-            System.out.println(hpModell.getFitness());
+            System.out.println("HydroContacts: " + hpModell.getHydroContacts());
+            System.out.println("Overlaps: " + hpModell.getOverlaps());
+            System.out.println("Fitness: " + hpModell.getFitness());
         }
     }
 
@@ -100,7 +102,8 @@ class Population {
 class HPModell {
     private ArrayList<Node> proteins;
     private int[][] maze = new int[20][20];
-    private int fitness;
+    private int hydroContacts;
+    private int overlaps;
 
     public HPModell() {
         this.proteins = new ArrayList<Node>();
@@ -197,7 +200,7 @@ class HPModell {
 
     public void calcFitness() {
 
-        this.fitness = 0;
+        this.hydroContacts = 0;
         int firstThree = 3;
         int x = 10;
         int y = 10;
@@ -209,8 +212,13 @@ class HPModell {
         int lastY = y;
 
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
+        overlaps = 0;
 
         for (Node currentNode : this.proteins) {
+            // Check overlap
+            if (maze[x][y] == 1) {
+                this.overlaps++;
+            }
 
             maze[x][y] = currentNode.getIsHydrophobic() ? 1 : 0;
             currentNode.setX(x);
@@ -231,16 +239,16 @@ class HPModell {
                 int down = maze[currentNode.getX() + 1][currentNode.getY()];
 
                 if (left == 1 && lastY != currentNode.getY() - 1) {
-                    this.fitness--;
+                    this.hydroContacts++;
                 }
                 if (right == 1 && lastY != currentNode.getY() + 1) {
-                    this.fitness--;
+                    this.hydroContacts++;
                 }
                 if (up == 1 && lastX != currentNode.getX() - 1) {
-                    this.fitness--;
+                    this.hydroContacts++;
                 }
                 if (down == 1 && lastX != currentNode.getX() + 1) {
-                    this.fitness--;
+                    this.hydroContacts++;
                 }
             }
 
@@ -269,8 +277,19 @@ class HPModell {
 
     }
 
-    public int getFitness() {
-        return this.fitness;
+    public double getFitness() {
+        // return (this.hydroContacts) / (this.overlaps + 1);
+        double hydroContacts = this.hydroContacts;
+        double overlaps = this.overlaps;
+        return (hydroContacts) / (overlaps + 1);
+    }
+
+    public int getOverlaps() {
+        return this.overlaps;
+    }
+
+    public int getHydroContacts() {
+        return this.hydroContacts;
     }
 
     public void printMaze() {
@@ -290,22 +309,7 @@ class HPModell {
 // 0 = hydrophil, "white"
 // 1 = hydrophob, "black"
 
-// enum TempNodeType {
-// Hydro(3), Polar(4);
-
-// public final int value;
-
-// private TempNodeType(int value) {
-// this.value = value;
-// }
-
-// public int getValue() {
-// return this.value;
-// }
-// }
-
 class Node {
-    // private Node nextNode;
     private RelDir direction;
     private boolean isHydrophobic;
     private int x, y;
@@ -338,10 +342,6 @@ class Node {
     public void setY(int y) {
         this.y = y;
     }
-
-    // public void setNextNode(Node nextNode) {
-    // this.nextNode = nextNode;
-    // }
 
     public void setDirection(RelDir direction) {
         this.direction = direction;
