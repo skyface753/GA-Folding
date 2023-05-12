@@ -24,10 +24,10 @@ public class HP {
 
     }
 
-    public void test() {
-        p.creatTestPop();
-        p.printModel();
-    }
+    // public void test() {
+    // p.creatTestPop();
+    // p.printModel();
+    // }
 
     public String escapeSpecialCharacters(String data) {
         String escapedData = data.replaceAll("\\R", " ");
@@ -58,25 +58,32 @@ public class HP {
 
     public void genAlgo() {
         p.createRandomPopulation(100);
+
         // population.printModel();
         double avgFitness = p.evaluation();
-        int maxGeneration = 1000;
+        int maxGeneration = 100;
         dataLines = new ArrayList<>();
-        // dataLines.add(new String[] { "John", "Doe", "38", "Comment Data\nAnother line
-        // of comment data" });
-        // dataLines.add(new String[] { "Jane", "Doe, Jr.", "19", "She said \"I'm being
-        // quoted\"" });
-        dataLines.add(new String[] { "Generation", "AvgFitness", "BestFitness", "BestSequenz" });
-
+        dataLines.add(new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll",
+                "HydroContactsOverAll", "BestSequenz" });
+        int round = 0;
         while (avgFitness < 200 &&
                 p.generation < maxGeneration) {
+
+            round++;
+            if (round % 10 == 0) {
+                System.out.println("Round: " + round + " diversity: " + p.getDiversity());
+            }
             p.generation++;
             p = p.selection(); // age biased replacement
             // p.crossover();
             // p.mutation();
 
             avgFitness = p.evaluation();
-            dataLines.add(new String[] { "" + p.generation, "" + avgFitness, "" + p.bestFitness, "" + p.bestSequenz });
+            dataLines.add(new String[] { "" + p.generation, "" + avgFitness, "" + p.besteFitnessOverAll,
+                    "" + p.bestHPModell.getFitness(),
+                    "" + p.anzahlHydroContactsOverAll,
+                    "" + p.bestHPModell.toString() });
+            p.exportBestAsImage();
             // scanner.nextLine();
         }
 

@@ -257,8 +257,18 @@ class HPModell {
     public void exportAsImage() {
         this.calcFitness();
 
-        int height = 1000;
-        int width = 1000;
+        String folder = "/tmp/ga";
+        String filename = this.toString() + ".png";
+        if (new File(folder).exists() == false)
+            new File(folder).mkdirs();
+        // Check if file exists
+        File file = new File(folder + "/" + filename);
+        if (file.exists()) {
+            return;
+        }
+
+        int height = 2000;
+        int width = 2000;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -273,8 +283,8 @@ class HPModell {
         g2.drawString("Fitness: " + this.getFitness(), 10, 60);
 
         int cellSize = 50;
-        int x = 500;
-        int y = 500;
+        int x = 1000;
+        int y = 1000;
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
         for (int i = 0; i < this.proteins.size(); i++) {
             Node currentNode = this.proteins.get(i);
@@ -305,30 +315,31 @@ class HPModell {
             // Update x and y
             g2.setColor(Color.RED);
 
-            switch (lastH_Richtung) {
-                case Nord:
-                    g2.drawLine(x + cellSize / 2, y, x + cellSize / 2, y - cellSize);
-                    y -= (cellSize * 2);
-                    break;
-                case Ost:
-                    g2.drawLine(x + cellSize, y + cellSize / 2, x + cellSize * 2, y + cellSize / 2);
-                    x += (cellSize * 2);
-                    break;
-                case Sued:
-                    g2.drawLine(x + cellSize / 2, y + cellSize, x + cellSize / 2, y + cellSize * 2);
-                    y += (cellSize * 2);
-                    break;
-                case West:
-                    g2.drawLine(x, y + cellSize / 2, x - cellSize, y + cellSize / 2);
-                    x -= (cellSize * 2);
-                    break;
-            }
-        }
+            // Dont draw last line
+            if (i != this.proteins.size() - 1) {
 
-        String folder = "/tmp/ga";
-        String filename = this.toString() + ".png";
-        if (new File(folder).exists() == false)
-            new File(folder).mkdirs();
+                switch (lastH_Richtung) {
+                    case Nord:
+                        g2.drawLine(x + cellSize / 2, y, x + cellSize / 2, y - cellSize);
+                        y -= (cellSize * 2);
+                        break;
+                    case Ost:
+                        g2.drawLine(x + cellSize, y + cellSize / 2, x + cellSize * 2, y + cellSize / 2);
+                        x += (cellSize * 2);
+                        break;
+                    case Sued:
+                        g2.drawLine(x + cellSize / 2, y + cellSize, x + cellSize / 2, y + cellSize * 2);
+                        y += (cellSize * 2);
+                        break;
+                    case West:
+                        g2.drawLine(x, y + cellSize / 2, x - cellSize, y + cellSize / 2);
+                        x -= (cellSize * 2);
+                        break;
+
+                }
+            }
+
+        }
 
         try {
             ImageIO.write(image, "png", new File(folder + File.separator + filename));
