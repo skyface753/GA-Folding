@@ -20,6 +20,7 @@ class HPModell {
     private ArrayList<Node> proteins;
     private int hydroContacts;
     private int overlaps;
+    public double fitnessProzent;
 
     public HPModell() {
         this.proteins = new ArrayList<Node>();

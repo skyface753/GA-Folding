@@ -2,6 +2,9 @@ import java.util.ArrayList;
 
 class Population {
     private ArrayList<HPModell> hpModellPopulation;
+    int generation = 0;
+    double bestFitness = 0;
+    String bestSequenz = "";
 
     public Population() {
         this.hpModellPopulation = new ArrayList<HPModell>();
@@ -27,7 +30,7 @@ class Population {
     public void createRandomPopulation(int size) {
         for (int i = 0; i < size; i++) {
             HPModell hpModell = new HPModell();
-            hpModell.createRandomHPModell(20);
+            hpModell.createRandomHPModell(40);
             this.hpModellPopulation.add(hpModell);
         }
     }
@@ -53,6 +56,52 @@ class Population {
         for (HPModell hpModell : this.hpModellPopulation) {
             hpModell.exportAsImage();
         }
+    }
+
+    public double evaluation() {
+        double avgFitness = 0;
+        bestFitness = 0;
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.calcFitness();
+            avgFitness += hpModell.getFitness();
+            if (hpModell.getFitness() > this.bestFitness) {
+                this.bestFitness = hpModell.getFitness();
+                this.bestSequenz = hpModell.toString();
+            }
+        }
+        avgFitness = avgFitness / this.hpModellPopulation.size();
+        // System.out.println("Generation: " + this.generation);
+        // System.out.println("Average Fitness: " + avgFitness);
+        return avgFitness;
+    }
+
+    public Population selection() {
+        // Gesamtfitness berechnen
+        double totalFitness = 0;
+        for (HPModell i : this.hpModellPopulation) {
+            i.calcFitness();
+            totalFitness += i.getFitness();
+        }
+        // Prozentsatz der Fitness berechnen
+        for (HPModell i : this.hpModellPopulation) {
+            i.fitnessProzent = i.getFitness() / totalFitness;
+        }
+        ArrayList<HPModell> newPopulation = new ArrayList<>();
+        // Individuen auswählen
+        ArrayList<HPModell> gluecksrad = new ArrayList<>();
+        for (HPModell i : this.hpModellPopulation) {
+            for (int j = 0; j < i.fitnessProzent * 100; j++) {
+                gluecksrad.add(i);
+            }
+
+        }
+        for (int i = 0; i < this.hpModellPopulation.size(); i++) {
+            int index = (int) (Math.random() * gluecksrad.size());
+            newPopulation.add(gluecksrad.get(index));
+        }
+        this.hpModellPopulation = newPopulation;
+
+        return this;
     }
 
 }
