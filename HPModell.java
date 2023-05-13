@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import java.awt.image.BufferedImage;
 import java.awt.Color;
@@ -65,10 +64,8 @@ class HPModell {
         for (int i = 0; i < anzahlNodes; i++) {
             boolean isHydrophobic = Math.random() < 0.5;
             RelDir direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
-            // Random direction
             while ((lastTreeDirections[0] == direction) && (lastTreeDirections[1] == direction)
                     && (lastTreeDirections[2] == direction)) {
-                // System.out.println("3x the same direction");
                 direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
             }
 
@@ -89,19 +86,9 @@ class HPModell {
         } else {
             this.mutateHydrophobic(node);
         }
-        // String oldDirection = node.getDirection().toString();
-        // int random = (int) (Math.random() * 3) - 1;
-        // int newDirection = (node.getDirection().ordinal() + random) %
-        // RelDir.values().length;
-        // // If negative, add 3
-        // newDirection = newDirection < 0 ? newDirection + 3 : newDirection;
-        // node.setDirection(RelDir.values()[newDirection]);
-        // System.out.println("Mutate " + oldDirection + " to " +
-        // node.getDirection().toString());
     }
 
     private void mutateDirection(Node node) {
-        String oldDirection = node.getDirection().toString();
         int plusorminus = (int) (Math.random() * 2);
         int newDirection = 0;
         if (plusorminus == 0) {
@@ -113,15 +100,10 @@ class HPModell {
         // If negative, add 3
         newDirection = newDirection < 0 ? newDirection + 3 : newDirection;
         node.setDirection(RelDir.values()[newDirection]);
-        // System.out.println("Mutate " + oldDirection + " to " +
-        // node.getDirection().toString());
     }
 
     private void mutateHydrophobic(Node node) {
-        String oldHydrophobic = node.getIsHydrophobic() ? "H" : "P";
         node.setIsHydrophobic(!node.getIsHydrophobic());
-        // System.out.println("Mutate " + oldHydrophobic + " to " +
-        // (node.getIsHydrophobic() ? "H" : "P"));
     }
 
     public void printPopulation() {
@@ -141,73 +123,17 @@ class HPModell {
         return result;
     }
 
-    private int[][] createOverlappingMaze() {
-        int anzProteins = this.proteins.size();
-        int x = anzProteins;
-        int y = anzProteins;
-        int maze[][] = new int[x * 2][y * 2];
-        for (int i = 0; i < x * 2; i++) {
-            Arrays.fill(maze[i], 0);
-        }
-
-        H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
-
-        for (Node currentNode : this.proteins) {
-
-            // maze[x][y] = currentNode.getIsHydrophobic() ? 1 : 0;
-            maze[x][y] = maze[x][y] + 1;
-            currentNode.setX(x);
-            currentNode.setY(y);
-
-            int initRichtung = lastH_Richtung.ordinal();
-            int relRichtung = currentNode.getDirection().getValue();
-            int intFromEnums = initRichtung + relRichtung;
-            int intFromEnumsMod = intFromEnums % 4;
-            lastH_Richtung = H_Richtung.values()[intFromEnumsMod < 0 ? intFromEnumsMod +
-                    4 : intFromEnumsMod];
-            // Update x and y
-            switch (lastH_Richtung) {
-                case Nord:
-                    x--;
-                    break;
-                case Ost:
-                    y++;
-                    break;
-                case Sued:
-                    x++;
-                    break;
-                case West:
-                    y--;
-                    break;
-            }
-
-            continue;
-
-        }
-        return maze;
-
-    }
-
     public void calcFitness() {
-
         this.hydroContacts = 0;
         int firstThree = 3;
         int x = 0;
         int y = 0;
-        // // maze = new int[20][20];
-        // for (int i = 0; i < 20; i++) {
-        // Arrays.fill(maze[i], -1);
-        // }
-        // int lastX = x;
-        // int lastY = y;
 
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
         overlaps = 0;
 
         for (int i = 0; i < this.proteins.size(); i++) {
             Node currentNode = this.proteins.get(i);
-
-            // maze[x][y] = currentNode.getIsHydrophobic() ? 1 : 0;
             currentNode.setX(x);
             currentNode.setY(y);
 
@@ -257,9 +183,6 @@ class HPModell {
                     y--;
                     break;
             }
-
-            // lastX = currentNode.getX();
-            // lastY = currentNode.getY();
             firstThree--;
             continue;
 
@@ -268,7 +191,6 @@ class HPModell {
     }
 
     public double getFitness() {
-        // return (this.hydroContacts) / (this.overlaps + 1);
         double hydroContacts = this.hydroContacts;
         double overlaps = this.overlaps;
         return (hydroContacts) / (overlaps + 1);
@@ -280,18 +202,6 @@ class HPModell {
 
     public int getHydroContacts() {
         return this.hydroContacts;
-    }
-
-    public void printOverlappingMaze() {
-        int maze[][] = this.createOverlappingMaze();
-        for (int i = 0; i < maze.length; i++) {
-            System.out.print("|");
-            for (int j = 0; j < maze[i].length; j++) {
-                System.out.print(maze[i][j] != 0 ? maze[i][j] : " ");
-                System.out.print("|");
-            }
-            System.out.println();
-        }
     }
 
     private void paintBorder(Graphics2D g, int x, int y, int width, int height) {
@@ -406,12 +316,4 @@ class HPModell {
             System.exit(0);
         }
     }
-
-    // public int getProteinLength() {
-    // return this.proteins.size();
-    // }
-
-    // public static int minProteinLength(HPModell a, HPModell b) {
-    // return Math.min(a.getProteinLength(), b.getProteinLength());
-    // }
 }

@@ -9,12 +9,7 @@ public class RandomSelector {
 
     public RandomSelector() {
         this.random = new Random();
-        // this(new Random());
     }
-
-    // public RandomSelector(Random random) {
-    // this.random = random;
-    // }
 
     public RandomSelector add(double weight, String result) {
         if (weight <= 0)
@@ -26,14 +21,6 @@ public class RandomSelector {
 
     public String next() {
         double value = random.nextDouble() * total;
-
-        // try {
-
         return map.higherEntry(value).getValue();
-        // } catch (Exception e) {
-        // System.out.println("Error: " + e);
-        // System.out.println("Value: " + value + " Total: " + total);
-        // return map.firstEntry().getValue();
-        // }
     }
 }

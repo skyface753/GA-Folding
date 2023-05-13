@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,58 +74,45 @@ public class HP {
         int populationSize = 100;
         p.createRandomPopulation(populationSize);
 
-        // population.printModel();
         double avgFitness = p.evaluation();
         int maxGeneration = 100;
         dataLines = new ArrayList<>();
         dataLines.add(new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll",
-                "HydroContactsOverAll", "BestSequenz" });
-        // Scanner scanner = new Scanner(System.in);
+                "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "BestSequenz" }); // csv header
         while (avgFitness < 8 &&
                 p.generation < maxGeneration) {
-            // if (p.anzahlHPModelle() < populationSize) {
-            // throw new RuntimeException("Population size is too small");
-            // }
-            // if (p.generation % 10 == 0) {
-            // System.out.println("Round: " + p.generation + " diversity: " +
-            // p.getDiversity());
-            // // Awating user input
-            // // scanner.nextLine();
-            // }
             p.generation++;
-            p = p.selection(); // age biased replacement
-            // System.out.println("Diversity vorher: " + p.getDiversity());
+            p = p.selection(); // fitness proportional selection
             if (withCrossAndMutation) {
-
                 p.crossover();
                 p.mutation();
             }
-            // System.out.println("Diversity nachher: " + p.getDiversity());
 
             avgFitness = p.evaluation();
             String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
                     "" + p.bestHPModell.getFitness(),
                     "" + p.besteFitnessOverAll,
                     "" + p.anzahlHydroContactsOverAll,
+                    "" + p.bestHPModell.getOverlaps(),
+                    "" + p.anzahlOverlapsOverAll,
                     "" + p.bestHPModell.toString() };
             dataLines.add(newLine);
 
             p.exportBestAsImage();
 
         }
-        // scanner.close();
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
         System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
         System.out.println("Generation: " + p.generation);
 
         try {
-            givenDataArray_whenConvertToCSV_thenOutputCreated();
+            givenDataArray_whenConvertToCSV_thenOutputCreated(); // write csv file
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void deleteFolder(File folder) {
+    private static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
         if (files != null) { // some JVMs return null for empty dirs
             for (File f : files) {
