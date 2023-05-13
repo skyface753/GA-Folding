@@ -18,7 +18,24 @@ public class HP {
 
     public static void main(String[] args) {
         HP hp = new HP();
-        hp.genAlgo(true);
+        // get withCrossAndMutation from args
+        boolean withCrossAndMutation = true;
+        if (args.length > 0) {
+            withCrossAndMutation = Boolean.parseBoolean(args[0]);
+        }
+        boolean imageOutput = false;
+        if (args.length > 1) {
+            imageOutput = Boolean.parseBoolean(args[1]);
+        }
+        int anzahlHPModellProteins = 20;
+        if (args.length > 2) {
+            anzahlHPModellProteins = Integer.parseInt(args[2]);
+        }
+        System.out.println("withCrossAndMutation: " + withCrossAndMutation);
+        System.out.println("imageOutput: " + imageOutput);
+        System.out.println("anzahlHPModellProteins: " + anzahlHPModellProteins);
+        HPModell.anzahlNodes = anzahlHPModellProteins;
+        hp.genAlgo(withCrossAndMutation, imageOutput);
         // hp.test();
     }
 
@@ -54,7 +71,7 @@ public class HP {
     }
 
     public void givenDataArray_whenConvertToCSV_thenOutputCreated() throws IOException {
-        File csvOutputFile = new File("/tmp/ga/output.csv");
+        File csvOutputFile = new File(outputFolder + "output.csv");
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataLines.stream()
                     .map(this::convertToCSV)
@@ -63,23 +80,28 @@ public class HP {
 
     }
 
-    public void genAlgo(boolean withCrossAndMutation) {
+    public void genAlgo(boolean withCrossAndMutation, boolean imageOutput) {
         if (withCrossAndMutation) {
             System.out.println("Genetic Algorithm with crossover and mutation");
         } else {
             System.out.println("Genetic Algorithm without crossover and mutation");
         }
-        deleteFolder(new File(outputFolder));
+        // deleteFolder(new File(outputFolder));
+        // Datetime as 2020-12-31-23-59-59
+        String datetime = java.time.LocalDateTime.now().toString().replace(":", "-").replace(".", "-");
+        outputFolder = outputFolder + datetime + "_crossandmutate_" + withCrossAndMutation + "/";
+        new File(outputFolder).mkdirs();
 
         int populationSize = 100;
         p.createRandomPopulation(populationSize);
 
         double avgFitness = p.evaluation();
-        int maxGeneration = 100;
+        int maxGeneration = 2000;
         dataLines = new ArrayList<>();
-        dataLines.add(new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll",
-                "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "BestSequenz" }); // csv header
-        while (avgFitness < 8 &&
+        dataLines.add(
+                new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
+                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "BestSequenz" }); // csv header
+        while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
             p.generation++;
             p = p.selection(); // fitness proportional selection
@@ -87,18 +109,23 @@ public class HP {
                 p.crossover();
                 p.mutation();
             }
+            if (p.generation % (maxGeneration / 10) == 0) {
+                System.out.println("Generation: " + p.generation);
+            }
 
             avgFitness = p.evaluation();
             String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
                     "" + p.bestHPModell.getFitness(),
                     "" + p.besteFitnessOverAll,
+                    "" + p.bestHPModell.getHydroContacts(),
                     "" + p.anzahlHydroContactsOverAll,
                     "" + p.bestHPModell.getOverlaps(),
                     "" + p.anzahlOverlapsOverAll,
                     "" + p.bestHPModell.toString() };
             dataLines.add(newLine);
-
-            p.exportBestAsImage();
+            if (imageOutput) {
+                p.exportBestAsImage();
+            }
 
         }
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
@@ -112,17 +139,17 @@ public class HP {
         }
     }
 
-    private static void deleteFolder(File folder) {
-        File[] files = folder.listFiles();
-        if (files != null) { // some JVMs return null for empty dirs
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteFolder(f);
-                } else {
-                    f.delete();
-                }
-            }
-        }
-        folder.delete();
-    }
+    // private static void deleteFolder(File folder) {
+    // File[] files = folder.listFiles();
+    // if (files != null) { // some JVMs return null for empty dirs
+    // for (File f : files) {
+    // if (f.isDirectory()) {
+    // deleteFolder(f);
+    // } else {
+    // f.delete();
+    // }
+    // }
+    // }
+    // folder.delete();
+    // }
 }
