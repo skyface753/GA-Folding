@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,9 +15,12 @@ import java.util.stream.Stream;
 public class HP {
     Population p;
 
+    public static String outputFolder = "/tmp/ga/";
+
     public static void main(String[] args) {
         HP hp = new HP();
-        hp.genAlgo();
+        hp.genAlgo(true);
+        // hp.test();
     }
 
     public HP() {
@@ -25,8 +29,12 @@ public class HP {
     }
 
     // public void test() {
-    // p.creatTestPop();
+    // p.creatTestPop1();
     // p.printModel();
+    // System.out.println("Diversity: " + p.getDiversity());
+    // p.crossover();
+    // p.printModel();
+    // System.out.println("Diversity: " + p.getDiversity());
     // }
 
     public String escapeSpecialCharacters(String data) {
@@ -56,8 +64,16 @@ public class HP {
 
     }
 
-    public void genAlgo() {
-        p.createRandomPopulation(100);
+    public void genAlgo(boolean withCrossAndMutation) {
+        if (withCrossAndMutation) {
+            System.out.println("Genetic Algorithm with crossover and mutation");
+        } else {
+            System.out.println("Genetic Algorithm without crossover and mutation");
+        }
+        deleteFolder(new File(outputFolder));
+
+        int populationSize = 100;
+        p.createRandomPopulation(populationSize);
 
         // population.printModel();
         double avgFitness = p.evaluation();
@@ -65,32 +81,62 @@ public class HP {
         dataLines = new ArrayList<>();
         dataLines.add(new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll",
                 "HydroContactsOverAll", "BestSequenz" });
-        int round = 0;
-        while (avgFitness < 200 &&
+        // Scanner scanner = new Scanner(System.in);
+        while (avgFitness < 8 &&
                 p.generation < maxGeneration) {
-
-            round++;
-            if (round % 10 == 0) {
-                System.out.println("Round: " + round + " diversity: " + p.getDiversity());
-            }
+            // if (p.anzahlHPModelle() < populationSize) {
+            // throw new RuntimeException("Population size is too small");
+            // }
+            // if (p.generation % 10 == 0) {
+            // System.out.println("Round: " + p.generation + " diversity: " +
+            // p.getDiversity());
+            // // Awating user input
+            // // scanner.nextLine();
+            // }
             p.generation++;
             p = p.selection(); // age biased replacement
-            // p.crossover();
-            // p.mutation();
+            // System.out.println("Diversity vorher: " + p.getDiversity());
+            if (withCrossAndMutation) {
+
+                p.crossover();
+                p.mutation();
+            }
+            // System.out.println("Diversity nachher: " + p.getDiversity());
 
             avgFitness = p.evaluation();
-            dataLines.add(new String[] { "" + p.generation, "" + avgFitness, "" + p.besteFitnessOverAll,
+            String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
                     "" + p.bestHPModell.getFitness(),
+                    "" + p.besteFitnessOverAll,
                     "" + p.anzahlHydroContactsOverAll,
-                    "" + p.bestHPModell.toString() });
+                    "" + p.bestHPModell.toString() };
+            dataLines.add(newLine);
+
             p.exportBestAsImage();
-            // scanner.nextLine();
+
         }
+        // scanner.close();
+        System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
+        System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
+        System.out.println("Generation: " + p.generation);
 
         try {
             givenDataArray_whenConvertToCSV_thenOutputCreated();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) { // some JVMs return null for empty dirs
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
     }
 }

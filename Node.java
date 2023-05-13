@@ -21,6 +21,10 @@ class Node {
         return this.isHydrophobic;
     }
 
+    public void setIsHydrophobic(boolean isHydrophobic) {
+        this.isHydrophobic = isHydrophobic;
+    }
+
     public void setX(int x) {
         this.x = x;
     }

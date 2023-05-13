@@ -21,13 +21,27 @@ class HPModell {
     private int hydroContacts;
     private int overlaps;
     public double fitnessProzent;
+    public static int anzahlNodes = 20;
+
+    public ArrayList<Node> getProteins() {
+        return this.proteins;
+    }
+
+    public void setProteins(ArrayList<Node> proteins) {
+        this.proteins = proteins;
+    }
 
     public HPModell() {
         this.proteins = new ArrayList<Node>();
 
     }
 
-    public void createFromSequenz(String sequenz) {
+    public HPModell(String sequenz) {
+        this.proteins = new ArrayList<Node>();
+        this.createFromSequenz(sequenz);
+    }
+
+    private void createFromSequenz(String sequenz) {
         for (int i = 0; i < sequenz.length(); i = i + 2) {
             boolean isHydrophobic = sequenz.charAt(i) == 'H';
             RelDir direction = null;
@@ -46,15 +60,15 @@ class HPModell {
         }
     }
 
-    public void createRandomHPModell(int length) {
+    public void createRandomHPModell() {
         RelDir lastTreeDirections[] = new RelDir[3];
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < anzahlNodes; i++) {
             boolean isHydrophobic = Math.random() < 0.5;
             RelDir direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
             // Random direction
             while ((lastTreeDirections[0] == direction) && (lastTreeDirections[1] == direction)
                     && (lastTreeDirections[2] == direction)) {
-                System.out.println("3x the same direction");
+                // System.out.println("3x the same direction");
                 direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
             }
 
@@ -65,6 +79,49 @@ class HPModell {
             this.proteins.add(new Node(direction, isHydrophobic));
 
         }
+    }
+
+    public void mutation() {
+        int index = (int) (Math.random() * this.proteins.size());
+        Node node = this.proteins.get(index);
+        if (Math.random() < 0.5) {
+            this.mutateDirection(node);
+        } else {
+            this.mutateHydrophobic(node);
+        }
+        // String oldDirection = node.getDirection().toString();
+        // int random = (int) (Math.random() * 3) - 1;
+        // int newDirection = (node.getDirection().ordinal() + random) %
+        // RelDir.values().length;
+        // // If negative, add 3
+        // newDirection = newDirection < 0 ? newDirection + 3 : newDirection;
+        // node.setDirection(RelDir.values()[newDirection]);
+        // System.out.println("Mutate " + oldDirection + " to " +
+        // node.getDirection().toString());
+    }
+
+    private void mutateDirection(Node node) {
+        String oldDirection = node.getDirection().toString();
+        int plusorminus = (int) (Math.random() * 2);
+        int newDirection = 0;
+        if (plusorminus == 0) {
+            newDirection = (node.getDirection().ordinal() + 1) % RelDir.values().length;
+        } else {
+            newDirection = (node.getDirection().ordinal() - 1) % RelDir.values().length;
+
+        }
+        // If negative, add 3
+        newDirection = newDirection < 0 ? newDirection + 3 : newDirection;
+        node.setDirection(RelDir.values()[newDirection]);
+        // System.out.println("Mutate " + oldDirection + " to " +
+        // node.getDirection().toString());
+    }
+
+    private void mutateHydrophobic(Node node) {
+        String oldHydrophobic = node.getIsHydrophobic() ? "H" : "P";
+        node.setIsHydrophobic(!node.getIsHydrophobic());
+        // System.out.println("Mutate " + oldHydrophobic + " to " +
+        // (node.getIsHydrophobic() ? "H" : "P"));
     }
 
     public void printPopulation() {
@@ -254,11 +311,12 @@ class HPModell {
         g.setColor(oldColor);
     }
 
-    public void exportAsImage() {
+    public void exportAsImage(int generation) {
         this.calcFitness();
 
-        String folder = "/tmp/ga";
-        String filename = this.toString() + ".png";
+        String folder = HP.outputFolder;
+        String filename = generation + "_" +
+                this.toString() + ".png";
         if (new File(folder).exists() == false)
             new File(folder).mkdirs();
         // Check if file exists
@@ -348,4 +406,12 @@ class HPModell {
             System.exit(0);
         }
     }
+
+    // public int getProteinLength() {
+    // return this.proteins.size();
+    // }
+
+    // public static int minProteinLength(HPModell a, HPModell b) {
+    // return Math.min(a.getProteinLength(), b.getProteinLength());
+    // }
 }
