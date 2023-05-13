@@ -18,24 +18,52 @@ public class HP {
 
     public static void main(String[] args) {
         HP hp = new HP();
-        // get withCrossAndMutation from args
         boolean withCrossAndMutation = true;
-        if (args.length > 0) {
-            withCrossAndMutation = Boolean.parseBoolean(args[0]);
-        }
         boolean imageOutput = false;
-        if (args.length > 1) {
-            imageOutput = Boolean.parseBoolean(args[1]);
-        }
         int anzahlHPModellProteins = 20;
-        if (args.length > 2) {
-            anzahlHPModellProteins = Integer.parseInt(args[2]);
+        int anzahlGenerationen = 100;
+        int anzahlPopulation = 100;
+        if (args[0].equals("-h")) {
+            System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
+            System.out.println("  -c true|false: with or without crossover and mutation (default: true)");
+            System.out.println("  -i true|false: with or without image output (default: false)");
+            System.out.println("  -p 20: number of HPModell proteins");
+            System.out.println("  -g 100: number of generations");
+            System.out.println("  -n 100: number of population");
+            return;
         }
+        for (int i = 0; i < args.length; i = i + 2) {
+            String arg = args[i];
+            String value = args[i + 1];
+            switch (arg) {
+                case "-c":
+                    withCrossAndMutation = Boolean.parseBoolean(value);
+                    break;
+                case "-i":
+                    imageOutput = Boolean.parseBoolean(value);
+                    break;
+                case "-p":
+                    anzahlHPModellProteins = Integer.parseInt(value);
+                    break;
+                case "-g":
+                    anzahlGenerationen = Integer.parseInt(value);
+                    break;
+                case "-n":
+                    anzahlPopulation = Integer.parseInt(value);
+                    break;
+                default:
+                    System.out.println("Unknown argument: " + arg);
+                    return;
+            }
+        }
+
         System.out.println("withCrossAndMutation: " + withCrossAndMutation);
         System.out.println("imageOutput: " + imageOutput);
         System.out.println("anzahlHPModellProteins: " + anzahlHPModellProteins);
+        System.out.println("anzahlGenerationen: " + anzahlGenerationen);
+        System.out.println("anzahlPopulation: " + anzahlPopulation);
         HPModell.anzahlNodes = anzahlHPModellProteins;
-        hp.genAlgo(withCrossAndMutation, imageOutput);
+        hp.genAlgo(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation);
         // hp.test();
     }
 
@@ -80,7 +108,7 @@ public class HP {
 
     }
 
-    public void genAlgo(boolean withCrossAndMutation, boolean imageOutput) {
+    public void genAlgo(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize) {
         if (withCrossAndMutation) {
             System.out.println("Genetic Algorithm with crossover and mutation");
         } else {
@@ -92,11 +120,11 @@ public class HP {
         outputFolder = outputFolder + datetime + "_crossandmutate_" + withCrossAndMutation + "/";
         new File(outputFolder).mkdirs();
 
-        int populationSize = 100;
+        // int populationSize = 100;
         p.createRandomPopulation(populationSize);
 
         double avgFitness = p.evaluation();
-        int maxGeneration = 2000;
+        // int maxGeneration = 2000;
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
