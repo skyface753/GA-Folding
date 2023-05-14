@@ -23,14 +23,16 @@ public class HP {
         int anzahlHPModellProteins = 20;
         int anzahlGenerationen = 100;
         int anzahlPopulation = 100;
-        if (args[0].equals("-h")) {
-            System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
-            System.out.println("  -c true|false: with or without crossover and mutation (default: true)");
-            System.out.println("  -i true|false: with or without image output (default: false)");
-            System.out.println("  -p 20: number of HPModell proteins");
-            System.out.println("  -g 100: number of generations");
-            System.out.println("  -n 100: number of population");
-            return;
+        if (args.length == 1) {
+            if (args[0].equals("-h")) {
+                System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
+                System.out.println("  -c true|false: with or without crossover and mutation (default: true)");
+                System.out.println("  -i true|false: with or without image output (default: false)");
+                System.out.println("  -p 20: number of HPModell proteins");
+                System.out.println("  -g 100: number of generations");
+                System.out.println("  -n 100: number of population");
+                return;
+            }
         }
         for (int i = 0; i < args.length; i = i + 2) {
             String arg = args[i];
@@ -128,9 +130,14 @@ public class HP {
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
-                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "BestSequenz" }); // csv header
+                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "Diversity", "BestSequenz" }); // csv
+                                                                                                                  // header
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
+            addStatistik(avgFitness);
+            if (imageOutput) {
+                p.exportBestAsImage();
+            }
             p.generation++;
             p = p.selection(); // fitness proportional selection
             if (withCrossAndMutation) {
@@ -142,20 +149,9 @@ public class HP {
             }
 
             avgFitness = p.evaluation();
-            String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
-                    "" + p.bestHPModell.getFitness(),
-                    "" + p.besteFitnessOverAll,
-                    "" + p.bestHPModell.getHydroContacts(),
-                    "" + p.anzahlHydroContactsOverAll,
-                    "" + p.bestHPModell.getOverlaps(),
-                    "" + p.anzahlOverlapsOverAll,
-                    "" + p.bestHPModell.toString() };
-            dataLines.add(newLine);
-            if (imageOutput) {
-                p.exportBestAsImage();
-            }
 
         }
+        addStatistik(avgFitness);
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
         System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
         System.out.println("Generation: " + p.generation);
@@ -165,6 +161,19 @@ public class HP {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addStatistik(double avgFitness) {
+        String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
+                "" + p.bestHPModell.getFitness(),
+                "" + p.besteFitnessOverAll,
+                "" + p.bestHPModell.getHydroContacts(),
+                "" + p.anzahlHydroContactsOverAll,
+                "" + p.bestHPModell.getOverlaps(),
+                "" + p.anzahlOverlapsOverAll,
+                "" + p.getDiversity(),
+                "" + p.bestHPModell.toString() };
+        dataLines.add(newLine);
     }
 
     // private static void deleteFolder(File folder) {
