@@ -54,25 +54,23 @@ class HPModell {
                 case 'R':
                     direction = RelDir.Right;
                     break;
+                default:
+                    throw new IllegalArgumentException("Invalid direction: " + sequenz.charAt(i + 1));
             }
             this.proteins.add(new Node(direction, isHydrophobic));
         }
     }
 
     public void createRandomHPModell() {
-        RelDir lastTreeDirections[] = new RelDir[3];
+        RelDir lastTwoDirections[] = new RelDir[2];
         for (int i = 0; i < anzahlNodes; i++) {
             boolean isHydrophobic = Math.random() < 0.5;
             RelDir direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
-            while ((lastTreeDirections[0] == direction) && (lastTreeDirections[1] == direction)
-                    && (lastTreeDirections[2] == direction)) {
+            while ((lastTwoDirections[0] == direction) && (lastTwoDirections[1] == direction)) {
                 direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
             }
-
-            lastTreeDirections[0] = lastTreeDirections[1];
-            lastTreeDirections[1] = lastTreeDirections[2];
-            lastTreeDirections[2] = direction;
-
+            lastTwoDirections[0] = lastTwoDirections[1];
+            lastTwoDirections[1] = direction;
             this.proteins.add(new Node(direction, isHydrophobic));
 
         }
@@ -125,7 +123,7 @@ class HPModell {
 
     public void calcFitness() {
         this.hydroContacts = 0;
-        int firstThree = 3;
+        // int firstThree = 3;
         int x = 0;
         int y = 0;
 
@@ -143,7 +141,9 @@ class HPModell {
             int intFromEnumsMod = intFromEnums % 4;
             lastH_Richtung = H_Richtung.values()[intFromEnumsMod < 0 ? intFromEnumsMod + 4 : intFromEnumsMod];
 
-            if (firstThree <= 0) { // Less than 3 nodes => No hydrophobic contacts and no overlaps
+            // if (firstThree <= 0) {
+            // Less than 3 nodes => No hydrophobic contacts and no overlaps
+            if (i >= 3) {
                 for (int j = 0; j < i - 2; j++) // j < i-1 => Excludes self and last
                 {
                     Node otherNode = this.proteins.get(j);
@@ -183,7 +183,7 @@ class HPModell {
                     y--;
                     break;
             }
-            firstThree--;
+            // firstThree--;
             continue;
 
         }

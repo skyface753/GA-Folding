@@ -32,6 +32,9 @@ public class HP {
                 System.out.println("  -g 100: number of generations");
                 System.out.println("  -n 100: number of population");
                 return;
+            } else if (args[0].equals("-t")) {
+                hp.test();
+                return;
             }
         }
         for (int i = 0; i < args.length; i = i + 2) {
@@ -74,14 +77,26 @@ public class HP {
 
     }
 
-    // public void test() {
-    // p.creatTestPop1();
-    // p.printModel();
-    // System.out.println("Diversity: " + p.getDiversity());
-    // p.crossover();
-    // p.printModel();
-    // System.out.println("Diversity: " + p.getDiversity());
-    // }
+    public void test() {
+        String SEQ20 = "10100110100101100101";
+        String SEQ24 = "110010010010010010010011";
+        String SEQ25 = "0010011000011000011000011";
+        String SEQ36 = "000110011000001111111001100001100100";
+        String SEQ48 = "001001100110000011111111110000001100110010011111";
+        String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        for (String seq : seqs) {
+            p = new Population();
+            p.createBenchmarkProp(seq);
+            double before = p.evaluation();
+            for (int i = 0; i < 100; i++) {
+                p = p.selection();
+                p.crossover();
+                p.mutation();
+            }
+            System.out.println(seq + " before: " + before + " after: " + p.evaluation());
+        }
+    }
 
     public String escapeSpecialCharacters(String data) {
         String escapedData = data.replaceAll("\\R", " ");

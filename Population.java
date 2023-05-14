@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import Helpers.Helpers.RelDir;
+
 class Population {
     private ArrayList<HPModell> hpModellPopulation;
     int generation = 0;
@@ -14,32 +16,63 @@ class Population {
         this.hpModellPopulation = new ArrayList<HPModell>();
     }
 
-    public void creatTestPop() {
-        String[] sequenzes = {
-                "HFPRPRHFPRHF", // Own Example = -2; 0 Overlaps
-                "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4; 0 Overlaps
-                "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9; 0 Overlaps
-                "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -2; 0 Overlaps
-                "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -3; 1 Overlap
-                "PFPRPRPR", // Test = 0; 0 Overlaps
-                "HFHRHRHRHRHRHRHRHFHLHLHLHF" // Test = -22; 9 Overlaps
-        };
-        for (String sequenz : sequenzes) {
-            HPModell hpModell = new HPModell(sequenz);
+    // public void creatTestPop() {
+    // String[] sequenzes = {
+    // "HFPRPRHFPRHF", // Own Example = -2; 0 Overlaps
+    // "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4; 0
+    // Overlaps
+    // "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9; 0
+    // Overlaps
+    // "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -2; 0 Overlaps
+    // "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -3; 1 Overlap
+    // "PFPRPRPR", // Test = 0; 0 Overlaps
+    // "HFHRHRHRHRHRHRHRHFHLHLHLHF" // Test = -22; 9 Overlaps
+    // };
+    // for (String sequenz : sequenzes) {
+    // HPModell hpModell = new HPModell(sequenz);
+    // this.hpModellPopulation.add(hpModell);
+    // }
+    // }
+
+    public void createBenchmarkProp(String currSeq) {
+        HPModell.anzahlNodes = currSeq.length();
+        int anzahlPopulation = 100;
+        String[] seq20permutations = new String[anzahlPopulation];
+        for (int i = 0; i < anzahlPopulation; i++) {
+            seq20permutations[i] = "";
+            for (int j = 0; j < currSeq.length(); j++) {
+                seq20permutations[i] += currSeq.charAt(j) == '0' ? "P" : "H";
+                int reldirint = (int) (Math.random() * 3); // 0, 1, 2
+                switch (reldirint) {
+                    case 0:
+                        seq20permutations[i] += "L";
+                        break;
+                    case 1:
+                        seq20permutations[i] += "R";
+                        break;
+                    case 2:
+                        seq20permutations[i] += "F";
+                        break;
+                }
+            }
+        }
+
+        for (int i = 0; i < anzahlPopulation; i++) {
+            HPModell hpModell = new HPModell(seq20permutations[i]);
             this.hpModellPopulation.add(hpModell);
         }
     }
 
-    public void creatTestPop1() {
-        String[] sequenzes = {
-                "HLPLPFPLHLPLPFPL",
-                "HLHRPRHFHLHRPRHF"
-        };
-        for (String sequenz : sequenzes) {
-            HPModell hpModell = new HPModell(sequenz);
-            this.hpModellPopulation.add(hpModell);
-        }
-    }
+    // public void creatTestPop1() {
+    // String[] sequenzes = {
+    // "HLPLPFPLHLPLPFPL",
+    // "HLHRPRHFHLHRPRHF"
+    // };
+    // for (String sequenz : sequenzes) {
+    // HPModell hpModell = new HPModell(sequenz);
+    // this.hpModellPopulation.add(hpModell);
+    // }
+    // }
 
     public void createRandomPopulation(int size) {
         for (int i = 0; i < size; i++) {
