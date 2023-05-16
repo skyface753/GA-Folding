@@ -26,9 +26,9 @@ class HPModell {
         return this.proteins;
     }
 
-    public void setProteins(ArrayList<Node> proteins) {
-        this.proteins = proteins;
-    }
+    // private void setProteins(ArrayList<Node> proteins) {
+    // this.proteins = proteins;
+    // }
 
     public HPModell() {
         this.proteins = new ArrayList<Node>();
@@ -42,7 +42,7 @@ class HPModell {
 
     private void createFromSequenz(String sequenz) {
         for (int i = 0; i < sequenz.length(); i = i + 2) {
-            boolean isHydrophobic = sequenz.charAt(i) == 'H';
+            boolean isHydrophobic = sequenz.charAt(i) == '1';
             RelDir direction = null;
             switch (sequenz.charAt(i + 1)) {
                 case 'L':
@@ -58,6 +58,20 @@ class HPModell {
                     throw new IllegalArgumentException("Invalid direction: " + sequenz.charAt(i + 1));
             }
             this.proteins.add(new Node(direction, isHydrophobic));
+        }
+    }
+
+    public RelDir[] getDirections() {
+        RelDir[] directions = new RelDir[this.proteins.size()];
+        for (int i = 0; i < this.proteins.size(); i++) {
+            directions[i] = this.proteins.get(i).getDirection();
+        }
+        return directions;
+    }
+
+    public void setDirections(RelDir[] directions) {
+        for (int i = 0; i < directions.length; i++) {
+            this.proteins.get(i).setDirection(directions[i]);
         }
     }
 
@@ -78,20 +92,20 @@ class HPModell {
     // }
     // }
 
-    public void mutation() {
-        int index = (int) (Math.random() * this.proteins.size());
-        // boolean fullMutation = Math.random() < 0.01;
-        Node node = this.proteins.get(index);
-        // if (fullMutation) {
-        // this.mutateFull(node);
-        // } else {
-        // if (Math.random() < 0.5) {
-        this.mutateDirection(node);
-        // } else {
-        // this.mutateHydrophobic(node);
-        // }
-        // }
-    }
+    // public void mutation() {
+    // int index = (int) (Math.random() * this.proteins.size());
+    // // boolean fullMutation = Math.random() < 0.01;
+    // Node node = this.proteins.get(index);
+    // // if (fullMutation) {
+    // // this.mutateFull(node);
+    // // } else {
+    // // if (Math.random() < 0.5) {
+    // this.mutateDirection(node);
+    // // } else {
+    // // this.mutateHydrophobic(node);
+    // // }
+    // // }
+    // }
 
     // private void mutateFull(Node node) {
     // node.setIsHydrophobic(Math.random() < 0.5);
@@ -99,7 +113,9 @@ class HPModell {
     // RelDir.values().length)]);
     // }
 
-    private void mutateDirection(Node node) {
+    public void mutateDirection() {
+        int index = (int) (Math.random() * this.proteins.size());
+        Node node = this.proteins.get(index);
         int plusorminus = (int) (Math.random() * 2);
         int newDirection = 0;
         if (plusorminus == 0) {
@@ -117,19 +133,19 @@ class HPModell {
     // node.setIsHydrophobic(!node.getIsHydrophobic());
     // }
 
-    public void printPopulation() {
-        for (Node node : this.proteins) {
-            System.out.print((node.getIsHydrophobic() ? "H" : "P")
-                    + (node.getDirection().toString()).substring(0, 1) + " ");
-        }
-        System.out.println();
-    }
+    // public void printPopulation() {
+    // for (Node node : this.proteins) {
+    // System.out.print((node.getIsHydrophobic() ? "H" : "P")
+    // + (node.getDirection().toString()).substring(0, 1) + " ");
+    // }
+    // System.out.println();
+    // }
 
     @Override
     public String toString() {
         String result = "";
         for (Node node : this.proteins) {
-            result += (node.getIsHydrophobic() ? "H" : "P") + (node.getDirection().toString()).substring(0, 1);
+            result += (node.getIsHydrophobic() ? "1" : "0") + (node.getDirection().toString()).substring(0, 1);
         }
         return result;
     }

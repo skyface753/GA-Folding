@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import Helpers.Helpers.RelDir;
+
 class Population {
     private ArrayList<HPModell> hpModellPopulation;
     int generation = 0;
@@ -38,7 +40,7 @@ class Population {
         for (int i = 0; i < anzahlPopulation; i++) {
             seq20permutations[i] = "";
             for (int j = 0; j < currSeq.length(); j++) {
-                seq20permutations[i] += currSeq.charAt(j) == '0' ? "P" : "H";
+                seq20permutations[i] += currSeq.charAt(j);
                 int reldirint = (int) (Math.random() * 3); // 0, 1, 2
                 switch (reldirint) {
                     case 0:
@@ -93,7 +95,7 @@ class Population {
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
             int randomIndex = (int) (Math.random() * this.hpModellPopulation.size());
-            this.hpModellPopulation.get(randomIndex).mutation();
+            this.hpModellPopulation.get(randomIndex).mutateDirection();
         }
     }
 
@@ -117,35 +119,35 @@ class Population {
             }
             HPModell hpModell1 = this.hpModellPopulation.get(randomIndex1);
             HPModell hpModell2 = this.hpModellPopulation.get(randomIndex2);
-            ArrayList<Node> proteins1 = hpModell1.getProteins();
-            ArrayList<Node> proteins2 = hpModell2.getProteins();
-            ArrayList<Node> proteins1New = new ArrayList<Node>();
-            ArrayList<Node> proteins2New = new ArrayList<Node>();
+            RelDir[] relDirs1 = hpModell1.getDirections();
+            RelDir[] relDirs2 = hpModell2.getDirections();
+            RelDir[] relDirs1New = new RelDir[HPModell.anzahlNodes];
+            RelDir[] relDirs2New = new RelDir[HPModell.anzahlNodes];
             int cutIndex = (int) (Math.random() * HPModell.anzahlNodes);
-
             for (int j = 0; j < cutIndex; j++) {
-                proteins1New.add(proteins1.get(j));
-                proteins2New.add(proteins2.get(j));
+                relDirs1New[j] = relDirs1[j];
+                relDirs2New[j] = relDirs2[j];
             }
             for (int j = cutIndex; j < HPModell.anzahlNodes; j++) {
-                proteins1New.add(proteins2.get(j));
-                proteins2New.add(proteins1.get(j));
+                relDirs1New[j] = relDirs2[j];
+                relDirs2New[j] = relDirs1[j];
             }
-            hpModell1.setProteins(proteins1New);
-            hpModell2.setProteins(proteins2New);
+            hpModell1.setDirections(relDirs1New);
+            hpModell2.setDirections(relDirs2New);
+
         }
     }
 
-    public void printModel() {
-        for (HPModell hpModell : this.hpModellPopulation) {
-            hpModell.printPopulation();
-            hpModell.calcFitness();
-            System.out.println("HydroContacts: " + hpModell.getHydroContacts());
-            System.out.println("Overlaps: " + hpModell.getOverlaps());
-            System.out.println("Fitness: " + hpModell.getFitness());
-            System.out.println();
-        }
-    }
+    // public void printModel() {
+    // for (HPModell hpModell : this.hpModellPopulation) {
+    // // hpModell.printPopulation();
+    // hpModell.calcFitness();
+    // System.out.println("HydroContacts: " + hpModell.getHydroContacts());
+    // System.out.println("Overlaps: " + hpModell.getOverlaps());
+    // System.out.println("Fitness: " + hpModell.getFitness());
+    // System.out.println();
+    // }
+    // }
 
     public void allToImages() {
         for (HPModell hpModell : this.hpModellPopulation) {

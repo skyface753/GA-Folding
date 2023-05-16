@@ -1,9 +1,13 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import Helpers.Helpers.RelDir;
 
 /**
  * HP
@@ -131,8 +135,9 @@ public class HP {
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
-                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "Diversity", "BestSequenz" }); // csv
-                                                                                                                  // header
+                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "Diversity", "BestDirections",
+                        "BestSequenz" }); // csv
+        // header
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
             addStatistik(avgFitness);
@@ -150,10 +155,12 @@ public class HP {
 
         }
         addStatistik(avgFitness);
-        System.out.println("Start Sequenz: " + seq);
+        System.out.println("Sequenz: " + seq);
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
+        System.out.println("Beste Directions: " + RelDir.toString(p.bestHPModell.getDirections()));
         System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
+        System.out.println("----------------------");
 
         try {
             givenDataArray_whenConvertToCSV_thenOutputCreated(); // write csv file
@@ -171,6 +178,7 @@ public class HP {
                 "" + p.bestHPModell.getOverlaps(),
                 "" + p.anzahlOverlapsOverAll,
                 "" + p.getDiversity(),
+                "" + RelDir.toString(p.bestHPModell.getDirections()),
                 "" + p.bestHPModell.toString() };
         dataLines.add(newLine);
     }
