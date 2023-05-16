@@ -13,16 +13,18 @@ import java.util.stream.Stream;
 
 public class HP {
     Population p;
-
-    public static String outputFolder = "/tmp/ga/";
+    public static String outputFolderPrefix = "/tmp/ga/";
+    public static String outputFolder;
 
     public static void main(String[] args) {
         HP hp = new HP();
+        String datetime = java.time.LocalDateTime.now().toString().replace(":", "-").replace(".", "-");
+        HP.outputFolderPrefix = HP.outputFolderPrefix + datetime + "/";
         boolean withCrossAndMutation = true;
         boolean imageOutput = false;
-        int anzahlHPModellProteins = 20;
         int anzahlGenerationen = 100;
         int anzahlPopulation = 100;
+        double mutationRate = 0.01;
         if (args.length == 1) {
             if (args[0].equals("-h")) {
                 System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
@@ -32,9 +34,9 @@ public class HP {
                 System.out.println("  -g 100: number of generations");
                 System.out.println("  -n 100: number of population");
                 return;
-            } else if (args[0].equals("-t")) {
-                hp.test();
-                return;
+                // } else if (args[0].equals("-t")) {
+                // hp.test();
+                // return;
             }
         }
         for (int i = 0; i < args.length; i = i + 2) {
@@ -47,14 +49,14 @@ public class HP {
                 case "-i":
                     imageOutput = Boolean.parseBoolean(value);
                     break;
-                case "-p":
-                    anzahlHPModellProteins = Integer.parseInt(value);
-                    break;
                 case "-g":
                     anzahlGenerationen = Integer.parseInt(value);
                     break;
                 case "-n":
                     anzahlPopulation = Integer.parseInt(value);
+                    break;
+                case "-m":
+                    mutationRate = Double.parseDouble(value);
                     break;
                 default:
                     System.out.println("Unknown argument: " + arg);
@@ -64,12 +66,9 @@ public class HP {
 
         System.out.println("withCrossAndMutation: " + withCrossAndMutation);
         System.out.println("imageOutput: " + imageOutput);
-        System.out.println("anzahlHPModellProteins: " + anzahlHPModellProteins);
         System.out.println("anzahlGenerationen: " + anzahlGenerationen);
         System.out.println("anzahlPopulation: " + anzahlPopulation);
-        HPModell.anzahlNodes = anzahlHPModellProteins;
-        hp.genAlgo(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation);
-        // hp.test();
+        hp.test(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation, mutationRate);
     }
 
     public HP() {
@@ -77,7 +76,8 @@ public class HP {
 
     }
 
-    public void test() {
+    public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
+            double mutationRate) {
         String SEQ20 = "10100110100101100101";
         String SEQ24 = "110010010010010010010011";
         String SEQ25 = "0010011000011000011000011";
@@ -86,15 +86,7 @@ public class HP {
         String SEQ50 = "11010101011110100010001000010001000101111010101011";
         String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
         for (String seq : seqs) {
-            p = new Population();
-            p.createBenchmarkProp(seq);
-            double before = p.evaluation();
-            for (int i = 0; i < 100; i++) {
-                p = p.selection();
-                p.crossover();
-                p.mutation();
-            }
-            System.out.println(seq + " before: " + before + " after: " + p.evaluation());
+            genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, seq);
         }
     }
 
@@ -116,7 +108,7 @@ public class HP {
     }
 
     public void givenDataArray_whenConvertToCSV_thenOutputCreated() throws IOException {
-        File csvOutputFile = new File(outputFolder + "output.csv");
+        File csvOutputFile = new File(HP.outputFolder + "output.csv");
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataLines.stream()
                     .map(this::convertToCSV)
@@ -125,23 +117,17 @@ public class HP {
 
     }
 
-    public void genAlgo(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize) {
-        if (withCrossAndMutation) {
-            System.out.println("Genetic Algorithm with crossover and mutation");
-        } else {
-            System.out.println("Genetic Algorithm without crossover and mutation");
-        }
-        // deleteFolder(new File(outputFolder));
-        // Datetime as 2020-12-31-23-59-59
-        String datetime = java.time.LocalDateTime.now().toString().replace(":", "-").replace(".", "-");
-        outputFolder = outputFolder + datetime + "_crossandmutate_" + withCrossAndMutation + "/";
+    public void genAlgo(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
+            double mutationRate,
+            String seq) {
+        HP.outputFolder = outputFolderPrefix + seq + "/";
         new File(outputFolder).mkdirs();
 
         // int populationSize = 100;
-        p.createRandomPopulation(populationSize);
+        p = new Population();
+        p.createFromSequenz(seq, populationSize);
 
         double avgFitness = p.evaluation();
-        // int maxGeneration = 2000;
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
@@ -157,19 +143,17 @@ public class HP {
             p = p.selection(); // fitness proportional selection
             if (withCrossAndMutation) {
                 p.crossover();
-                p.mutation();
-            }
-            if (p.generation % (maxGeneration / 10) == 0) {
-                System.out.println("Generation: " + p.generation);
+                p.mutation(mutationRate);
             }
 
             avgFitness = p.evaluation();
 
         }
         addStatistik(avgFitness);
+        System.out.println("Start Sequenz: " + seq);
+        System.out.println("Durchschnittliche Fitness: " + avgFitness);
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
         System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
-        System.out.println("Generation: " + p.generation);
 
         try {
             givenDataArray_whenConvertToCSV_thenOutputCreated(); // write csv file
@@ -190,18 +174,4 @@ public class HP {
                 "" + p.bestHPModell.toString() };
         dataLines.add(newLine);
     }
-
-    // private static void deleteFolder(File folder) {
-    // File[] files = folder.listFiles();
-    // if (files != null) { // some JVMs return null for empty dirs
-    // for (File f : files) {
-    // if (f.isDirectory()) {
-    // deleteFolder(f);
-    // } else {
-    // f.delete();
-    // }
-    // }
-    // }
-    // folder.delete();
-    // }
 }

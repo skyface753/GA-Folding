@@ -61,30 +61,43 @@ class HPModell {
         }
     }
 
-    public void createRandomHPModell() {
-        RelDir lastTwoDirections[] = new RelDir[2];
-        for (int i = 0; i < anzahlNodes; i++) {
-            boolean isHydrophobic = Math.random() < 0.5;
-            RelDir direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
-            while ((lastTwoDirections[0] == direction) && (lastTwoDirections[1] == direction)) {
-                direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
-            }
-            lastTwoDirections[0] = lastTwoDirections[1];
-            lastTwoDirections[1] = direction;
-            this.proteins.add(new Node(direction, isHydrophobic));
+    // public void createRandomHPModell() {
+    // RelDir lastTwoDirections[] = new RelDir[2];
+    // for (int i = 0; i < anzahlNodes; i++) {
+    // boolean isHydrophobic = Math.random() < 0.5;
+    // RelDir direction = RelDir.values()[(int) (Math.random() *
+    // RelDir.values().length)];
+    // while ((lastTwoDirections[0] == direction) && (lastTwoDirections[1] ==
+    // direction)) {
+    // direction = RelDir.values()[(int) (Math.random() * RelDir.values().length)];
+    // }
+    // lastTwoDirections[0] = lastTwoDirections[1];
+    // lastTwoDirections[1] = direction;
+    // this.proteins.add(new Node(direction, isHydrophobic));
 
-        }
-    }
+    // }
+    // }
 
     public void mutation() {
         int index = (int) (Math.random() * this.proteins.size());
+        // boolean fullMutation = Math.random() < 0.01;
         Node node = this.proteins.get(index);
-        if (Math.random() < 0.5) {
-            this.mutateDirection(node);
-        } else {
-            this.mutateHydrophobic(node);
-        }
+        // if (fullMutation) {
+        // this.mutateFull(node);
+        // } else {
+        // if (Math.random() < 0.5) {
+        this.mutateDirection(node);
+        // } else {
+        // this.mutateHydrophobic(node);
+        // }
+        // }
     }
+
+    // private void mutateFull(Node node) {
+    // node.setIsHydrophobic(Math.random() < 0.5);
+    // node.setDirection(RelDir.values()[(int) (Math.random() *
+    // RelDir.values().length)]);
+    // }
 
     private void mutateDirection(Node node) {
         int plusorminus = (int) (Math.random() * 2);
@@ -100,9 +113,9 @@ class HPModell {
         node.setDirection(RelDir.values()[newDirection]);
     }
 
-    private void mutateHydrophobic(Node node) {
-        node.setIsHydrophobic(!node.getIsHydrophobic());
-    }
+    // private void mutateHydrophobic(Node node) {
+    // node.setIsHydrophobic(!node.getIsHydrophobic());
+    // }
 
     public void printPopulation() {
         for (Node node : this.proteins) {

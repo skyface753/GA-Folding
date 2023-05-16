@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import Helpers.Helpers.RelDir;
-
 class Population {
     private ArrayList<HPModell> hpModellPopulation;
     int generation = 0;
@@ -34,9 +32,8 @@ class Population {
     // }
     // }
 
-    public void createBenchmarkProp(String currSeq) {
+    public void createFromSequenz(String currSeq, int anzahlPopulation) {
         HPModell.anzahlNodes = currSeq.length();
-        int anzahlPopulation = 100;
         String[] seq20permutations = new String[anzahlPopulation];
         for (int i = 0; i < anzahlPopulation; i++) {
             seq20permutations[i] = "";
@@ -74,13 +71,13 @@ class Population {
     // }
     // }
 
-    public void createRandomPopulation(int size) {
-        for (int i = 0; i < size; i++) {
-            HPModell hpModell = new HPModell();
-            hpModell.createRandomHPModell();
-            this.hpModellPopulation.add(hpModell);
-        }
-    }
+    // public void createRandomPopulation(int size) {
+    // for (int i = 0; i < size; i++) {
+    // HPModell hpModell = new HPModell();
+    // hpModell.createRandomHPModell();
+    // this.hpModellPopulation.add(hpModell);
+    // }
+    // }
 
     public int getDiversity() {
         Set<String> set = new HashSet<String>();
@@ -90,8 +87,9 @@ class Population {
         return set.size();
     }
 
-    public void mutation() {
-        int anzahlMutationen = (int) (this.hpModellPopulation.size() * HPModell.anzahlNodes * 0.01);
+    public void mutation(double mutationRate) {
+
+        int anzahlMutationen = (int) (this.hpModellPopulation.size() * HPModell.anzahlNodes * mutationRate);
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
             int randomIndex = (int) (Math.random() * this.hpModellPopulation.size());
