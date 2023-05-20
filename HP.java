@@ -34,7 +34,6 @@ public class HP {
                 System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
                 System.out.println("  -c true|false: with or without crossover and mutation (default: true)");
                 System.out.println("  -i true|false: with or without image output (default: false)");
-                System.out.println("  -p 20: number of HPModell proteins");
                 System.out.println("  -g 100: number of generations");
                 System.out.println("  -n 100: number of population");
                 return;
