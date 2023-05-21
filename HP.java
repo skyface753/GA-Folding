@@ -29,6 +29,7 @@ public class HP {
         int anzahlGenerationen = 100;
         int anzahlPopulation = 100;
         double mutationRate = 0.01;
+        Boolean tunierSelection = false;
         if (args.length == 1) {
             if (args[0].equals("-h")) {
                 System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
@@ -36,6 +37,8 @@ public class HP {
                 System.out.println("  -i true|false: with or without image output (default: false)");
                 System.out.println("  -g 100: number of generations");
                 System.out.println("  -n 100: number of population");
+                System.out.println("  -m 0.01: mutation rate");
+                System.out.println("  -t true|false: tunier selection (default: false)");
                 return;
                 // } else if (args[0].equals("-t")) {
                 // hp.test();
@@ -61,6 +64,9 @@ public class HP {
                 case "-m":
                     mutationRate = Double.parseDouble(value);
                     break;
+                case "-t":
+                    tunierSelection = Boolean.parseBoolean(value);
+                    break;
                 default:
                     System.out.println("Unknown argument: " + arg);
                     return;
@@ -71,7 +77,10 @@ public class HP {
         System.out.println("imageOutput: " + imageOutput);
         System.out.println("anzahlGenerationen: " + anzahlGenerationen);
         System.out.println("anzahlPopulation: " + anzahlPopulation);
-        hp.test(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation, mutationRate);
+        System.out.println("mutationRate: " + mutationRate);
+        System.out.println("tunierSelection: " + tunierSelection);
+        hp.test(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation, mutationRate,
+                tunierSelection);
     }
 
     public HP() {
@@ -80,7 +89,7 @@ public class HP {
     }
 
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
-            double mutationRate) {
+            double mutationRate, Boolean tunierSelection) {
         String SEQ20 = "10100110100101100101";
         String SEQ24 = "110010010010010010010011";
         String SEQ25 = "0010011000011000011000011";
@@ -89,7 +98,9 @@ public class HP {
         String SEQ50 = "11010101011110100010001000010001000101111010101011";
         String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
         for (String seq : seqs) {
-            genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, seq);
+            genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate,
+                    tunierSelection,
+                    seq);
         }
     }
 
@@ -122,6 +133,7 @@ public class HP {
 
     public void genAlgo(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
             double mutationRate,
+            Boolean tunierSelection,
             String seq) {
         HP.outputFolder = outputFolderPrefix + seq + "/";
         new File(outputFolder).mkdirs();
@@ -144,7 +156,11 @@ public class HP {
                 p.exportBestAsImage();
             }
             p.generation++;
-            p = p.selection(); // fitness proportional selection
+            if (tunierSelection) {
+                p = p.turnierSelection(); // turnier selection
+            } else {
+                p = p.selection(); // fitness proportional selection
+            }
             if (withCrossAndMutation) {
                 p.crossover();
                 p.mutation(mutationRate);

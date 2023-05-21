@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import Helpers.Helpers.RelDir;
@@ -191,6 +193,33 @@ class Population {
             newPopulation.add(hpModell);
         }
 
+        this.hpModellPopulation = newPopulation;
+        return this;
+    }
+
+    public Population turnierSelection() {
+        int anzahl = this.hpModellPopulation.size();
+        ArrayList<HPModell> newPopulation = new ArrayList<>();
+        Random r = new Random();
+        for (int i = 0; i < anzahl; i++) {
+            // int result = r.nextInt(high-low) + low;
+            // Number between 2 and anzahl
+            int anzahlKandidaten = r.nextInt(anzahl - 2) + 2;
+            Set<Integer> set = new HashSet<>();
+            while (set.size() < anzahlKandidaten) {
+                set.add(r.nextInt(anzahl));
+            }
+            ArrayList<Integer> list = new ArrayList<>(set);
+            Collections.sort(list);
+            HPModell bestHPModell = this.hpModellPopulation.get(list.get(0));
+            for (int j = 1; j < list.size(); j++) {
+                if (this.hpModellPopulation.get(list.get(j)).getFitness() > bestHPModell.getFitness()) {
+                    bestHPModell = this.hpModellPopulation.get(list.get(j));
+                }
+            }
+            HPModell hpModell = new HPModell(bestHPModell.toString());
+            newPopulation.add(hpModell);
+        }
         this.hpModellPopulation = newPopulation;
         return this;
     }

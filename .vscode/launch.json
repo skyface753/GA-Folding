@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "P01HashSeh",
+      "request": "launch",
+      "mainClass": "P01HashSeh",
+      "projectName": "GA-Praktikum_3b0f189e"
+    },
+    {
+      "type": "java",
       "name": "HP",
       "request": "launch",
       "mainClass": "HP",
