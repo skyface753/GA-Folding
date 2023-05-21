@@ -29,6 +29,7 @@ public class HP {
         int anzahlGenerationen = 100;
         int anzahlPopulation = 100;
         double mutationRate = 0.01;
+        Boolean scaleMutationRate = false;
         Boolean tunierSelection = false;
         if (args.length == 1) {
             if (args[0].equals("-h")) {
@@ -38,7 +39,9 @@ public class HP {
                 System.out.println("  -g 100: number of generations");
                 System.out.println("  -n 100: number of population");
                 System.out.println("  -m 0.01: mutation rate");
+                System.out.println("  -s true|false: scale mutation rate (default: false)");
                 System.out.println("  -t true|false: tunier selection (default: false)");
+
                 return;
                 // } else if (args[0].equals("-t")) {
                 // hp.test();
@@ -64,6 +67,9 @@ public class HP {
                 case "-m":
                     mutationRate = Double.parseDouble(value);
                     break;
+                case "-s":
+                    scaleMutationRate = Boolean.parseBoolean(value);
+                    break;
                 case "-t":
                     tunierSelection = Boolean.parseBoolean(value);
                     break;
@@ -78,8 +84,10 @@ public class HP {
         System.out.println("anzahlGenerationen: " + anzahlGenerationen);
         System.out.println("anzahlPopulation: " + anzahlPopulation);
         System.out.println("mutationRate: " + mutationRate);
+        System.out.println("scaleMutationRate: " + scaleMutationRate);
         System.out.println("tunierSelection: " + tunierSelection);
         hp.test(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation, mutationRate,
+                scaleMutationRate,
                 tunierSelection);
     }
 
@@ -89,7 +97,7 @@ public class HP {
     }
 
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
-            double mutationRate, Boolean tunierSelection) {
+            double mutationRate, Boolean scaleMutationRate, Boolean tunierSelection) {
         String SEQ20 = "10100110100101100101";
         String SEQ24 = "110010010010010010010011";
         String SEQ25 = "0010011000011000011000011";
@@ -98,7 +106,7 @@ public class HP {
         String SEQ50 = "11010101011110100010001000010001000101111010101011";
         String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
         for (String seq : seqs) {
-            genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate,
+            genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, scaleMutationRate,
                     tunierSelection,
                     seq);
         }
@@ -132,7 +140,7 @@ public class HP {
     }
 
     public void genAlgo(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
-            double mutationRate,
+            double initMutationRate, Boolean scaleMutationRate,
             Boolean tunierSelection,
             String seq) {
         HP.outputFolder = outputFolderPrefix + seq + "/";
@@ -146,30 +154,46 @@ public class HP {
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
-                        "BestOverlaps", "HydroContactsOverAll", "OverlapsOverAll", "Diversity", "BestDirections",
+                        "BestOverlaps", "HydroContactsOverAll", "OverlapsOverAll",
+                        "MutationRate",
+                        "AnzahlMutationen",
+                        "Diversity", "BestDirections",
                         "BestSequenz" }); // csv
         // header
+        double mutationRate = initMutationRate;
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
-            addStatistik(avgFitness);
+
             if (imageOutput) {
                 p.exportBestAsImage();
             }
             p.generation++;
+            if (withCrossAndMutation) {
+                p.crossover();
+                mutationRate = scaleMutationRate ? initMutationRate * (1 - (double) p.generation / maxGeneration)
+                        : initMutationRate;
+
+                /*
+                 * mutationRate 0.01, generation 1 -> 0.01 * (1 - 1/100) = 0.0099 mutationRate
+                 * mutationRate 0.01, generation 100 -> 0.01 * (1 - 100/100) = 0 mutationRate
+                 * mutationRate 0.03, generation 1 -> 0.03 * (1 - 1/100) = 0.0297 mutationRate
+                 * mutationRate 0.03, generation 100 -> 0.03 * (1 - 100/100) = 0 mutationRate
+                 */
+                int anzahlMutationen = p.mutation(mutationRate);
+                addStatistik(avgFitness, mutationRate, anzahlMutationen);
+            } else {
+                addStatistik(avgFitness, 0, 0);
+            }
             if (tunierSelection) {
                 p = p.turnierSelection(); // turnier selection
             } else {
                 p = p.selection(); // fitness proportional selection
             }
-            if (withCrossAndMutation) {
-                p.crossover();
-                p.mutation(mutationRate);
-            }
 
             avgFitness = p.evaluation();
 
         }
-        addStatistik(avgFitness);
+        addStatistik(avgFitness, 0, 0);
         System.out.println("Sequenz: " + seq);
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
         System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
@@ -184,7 +208,7 @@ public class HP {
         }
     }
 
-    private void addStatistik(double avgFitness) {
+    private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen) {
         String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
                 "" + p.bestHPModell.getFitness(),
                 "" + p.besteFitnessOverAll,
@@ -192,6 +216,8 @@ public class HP {
                 "" + p.bestHPModell.getOverlaps(),
                 "" + p.anzahlHydroContactsOverAll,
                 "" + p.anzahlOverlapsOverAll,
+                "" + mutationRate,
+                "" + anzahlMutationen,
                 "" + p.getDiversity(),
                 "" + RelDir.toString(p.bestHPModell.getDirections()),
                 "" + p.bestHPModell.toString() };

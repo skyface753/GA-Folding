@@ -91,14 +91,14 @@ class Population {
         return set.size();
     }
 
-    public void mutation(double mutationRate) {
-
+    public int mutation(double mutationRate) {
         int anzahlMutationen = (int) (this.hpModellPopulation.size() * HPModell.anzahlNodes * mutationRate);
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
             int randomIndex = (int) (Math.random() * this.hpModellPopulation.size());
             this.hpModellPopulation.get(randomIndex).mutateDirection();
         }
+        return anzahlMutationen;
     }
 
     public void crossover() {
