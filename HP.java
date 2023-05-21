@@ -134,7 +134,7 @@ public class HP {
         dataLines = new ArrayList<>();
         dataLines.add(
                 new String[] { "Generation", "AvgFitness", "BestFitness", "BesteFitnessOverAll", "BestHydroContacts",
-                        "HydroContactsOverAll", "BestOverlaps", "OverlapsOverAll", "Diversity", "BestDirections",
+                        "BestOverlaps", "HydroContactsOverAll", "OverlapsOverAll", "Diversity", "BestDirections",
                         "BestSequenz" }); // csv
         // header
         while (avgFitness < 45 &&
@@ -173,8 +173,8 @@ public class HP {
                 "" + p.bestHPModell.getFitness(),
                 "" + p.besteFitnessOverAll,
                 "" + p.bestHPModell.getHydroContacts(),
-                "" + p.anzahlHydroContactsOverAll,
                 "" + p.bestHPModell.getOverlaps(),
+                "" + p.anzahlHydroContactsOverAll,
                 "" + p.anzahlOverlapsOverAll,
                 "" + p.getDiversity(),
                 "" + RelDir.toString(p.bestHPModell.getDirections()),
