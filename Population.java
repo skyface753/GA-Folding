@@ -146,7 +146,7 @@ class Population {
         return avgFitness;
     }
 
-    public void sigmaScale() {
+    private void sigmaScale() {
         // standard deviation
         // double sd = 0;
         // double avgFitness = 0;
@@ -169,8 +169,11 @@ class Population {
         }
     }
 
-    public Population selection(boolean withSigmaScaling) {
+    public Population selection(boolean withSigmaScaling, boolean elitismus) {
         RandomSelector randomSelector = new RandomSelector();
+        if (withSigmaScaling) {
+            sigmaScale();
+        }
         for (int i = 0; i < this.hpModellPopulation.size(); i++) {
             if (withSigmaScaling) {
                 // 1 + (fitnessScaled - avgFitness) / (2 * sd)
@@ -187,6 +190,10 @@ class Population {
         }
         ArrayList<HPModell> newPopulation = new ArrayList<>();
         int anzahl = this.hpModellPopulation.size();
+        if (elitismus) {
+            anzahl--;
+            newPopulation.add(new HPModell(bestHPModell.toString()));
+        }
         for (int i = 0; i < anzahl; i++) {
             HPModell hpModell = new HPModell(randomSelector.next());
             newPopulation.add(hpModell);
@@ -196,13 +203,21 @@ class Population {
         return this;
     }
 
-    public Population turnierSelection() {
+    public Population turnierSelection(boolean elitismus) {
         int anzahl = this.hpModellPopulation.size();
         ArrayList<HPModell> newPopulation = new ArrayList<>();
         Random r = new Random();
         int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten, maximal alle
         double t = 0.90;
-        boolean searchForBest = (Math.random() < t); // 90% Chance, dass der beste gewinnt
+        boolean searchForBest = true;
+        if (anzahlKandidaten == 2 && (Math.random() > t)) {
+            searchForBest = false;
+        } // 90% Chance, dass der beste gewinnt
+
+        if (elitismus) {
+            anzahl--;
+            newPopulation.add(new HPModell(bestHPModell.toString()));
+        }
         // Reset aller Fitness-Werte
         for (HPModell hpModell : this.hpModellPopulation) {
             hpModell.resetFitness();
@@ -215,16 +230,15 @@ class Population {
             }
             HPModell tunierWinner = this.hpModellPopulation.get(set.iterator().next());
             for (Integer j : set) {
-                // if (searchForBest) {
-                if (this.hpModellPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
-                    tunierWinner = this.hpModellPopulation.get(j);
+                if (searchForBest) {
+                    if (this.hpModellPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
+                        tunierWinner = this.hpModellPopulation.get(j);
+                    }
+                } else {
+                    if (this.hpModellPopulation.get(j).getFitness() < tunierWinner.getFitness()) {
+                        tunierWinner = this.hpModellPopulation.get(j);
+                    }
                 }
-                // } else {
-                // if (this.hpModellPopulation.get(j).getFitness() < tunierWinner.getFitness())
-                // {
-                // tunierWinner = this.hpModellPopulation.get(j);
-                // }
-                // }
             }
             HPModell hpModell = new HPModell(tunierWinner.toString());
             newPopulation.add(hpModell);
