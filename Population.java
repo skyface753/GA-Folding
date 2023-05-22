@@ -13,6 +13,8 @@ class Population {
     double besteFitnessOverAll = 0;
     int anzahlHydroContactsOverAll = 0;
     int anzahlOverlapsOverAll = 0;
+    double avgFitness = 0;
+    double sd = 0;
 
     public Population() {
         this.hpModellPopulation = new ArrayList<HPModell>();
@@ -121,12 +123,12 @@ class Population {
     }
 
     public double evaluation() {
-        double avgFitness = 0;
+        // double avgFitness = 0;
         bestHPModell = this.hpModellPopulation.get(0);
         for (HPModell hpModell : this.hpModellPopulation) {
             hpModell.calcFitness();
             avgFitness += hpModell.getFitness();
-            if (hpModell.getFitness() > bestHPModell.getFitness()) {
+            if (hpModell.getFitness() > bestHPModell.getFitness() && hpModell.getOverlaps() == 0) {
                 bestHPModell = hpModell;
             }
             if (hpModell.getFitness() > this.besteFitnessOverAll) {
@@ -140,14 +142,48 @@ class Population {
             }
         }
         avgFitness = avgFitness / this.hpModellPopulation.size();
+        // this.avgFitness = avgFitness;
         return avgFitness;
     }
 
-    public Population selection() {
+    public void sigmaScale() {
+        // standard deviation
+        // double sd = 0;
+        // double avgFitness = 0;
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.calcFitness();
+            avgFitness += hpModell.getFitness();
+        }
+        avgFitness = avgFitness / this.hpModellPopulation.size();
+        for (HPModell hpModell : this.hpModellPopulation) {
+            sd += Math.pow(hpModell.getFitness() - avgFitness, 2);
+        }
+        sd = Math.sqrt(sd / this.hpModellPopulation.size());
+        // System.out.println("sd: " + sd);
+        double c = 2;
+        // f` = max(f-(avgFitness-c*sd),0)
+        for (HPModell hpModell : this.hpModellPopulation) {
+            double fitness = hpModell.getFitness();
+            fitness = Math.max(fitness - (avgFitness - c * sd), 0);
+            hpModell.fitnessScaled = fitness;
+        }
+    }
+
+    public Population selection(boolean withSigmaScaling) {
         RandomSelector randomSelector = new RandomSelector();
         for (int i = 0; i < this.hpModellPopulation.size(); i++) {
-            this.hpModellPopulation.get(i).calcFitness();
-            randomSelector.add(this.hpModellPopulation.get(i).getFitness(), this.hpModellPopulation.get(i).toString());
+            if (withSigmaScaling) {
+                // 1 + (fitnessScaled - avgFitness) / (2 * sd)
+                double fitnessScaled = this.hpModellPopulation.get(i).fitnessScaled;
+                double expValue = Math.max(1 + (fitnessScaled - avgFitness) / (2 * sd), 0.1);
+                randomSelector.add(expValue, this.hpModellPopulation.get(i).toString());
+            } else {
+                this.hpModellPopulation.get(i).calcFitness();
+                randomSelector.add(this.hpModellPopulation.get(i).getFitness(),
+                        this.hpModellPopulation.get(i).toString());
+            }
+            // randomSelector.add(this.hpModellPopulation.get(i).getFitness(),
+            // this.hpModellPopulation.get(i).toString());
         }
         ArrayList<HPModell> newPopulation = new ArrayList<>();
         int anzahl = this.hpModellPopulation.size();

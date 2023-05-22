@@ -19,7 +19,8 @@ class HPModell {
     private ArrayList<Node> proteins;
     private int hydroContacts;
     private int overlaps;
-    public double fitnessProzent;
+    public double fitnessScaled;
+    // public double fitnessProzent;
     public static int anzahlNodes = 20;
 
     public ArrayList<Node> getProteins() {
