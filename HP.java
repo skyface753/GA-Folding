@@ -170,15 +170,9 @@ public class HP {
             p.generation++;
             if (withCrossAndMutation) {
                 p.crossover();
-                mutationRate = scaleMutationRate ? initMutationRate * (1 - (double) p.generation / maxGeneration)
+                mutationRate = scaleMutationRate
+                        ? (initMutationRate * (1 - (double) p.generation / maxGeneration) + 0.01) // scale mutation rate
                         : initMutationRate;
-
-                /*
-                 * mutationRate 0.01, generation 1 -> 0.01 * (1 - 1/100) = 0.0099 mutationRate
-                 * mutationRate 0.01, generation 100 -> 0.01 * (1 - 100/100) = 0 mutationRate
-                 * mutationRate 0.03, generation 1 -> 0.03 * (1 - 1/100) = 0.0297 mutationRate
-                 * mutationRate 0.03, generation 100 -> 0.03 * (1 - 100/100) = 0 mutationRate
-                 */
                 int anzahlMutationen = p.mutation(mutationRate);
                 addStatistik(avgFitness, mutationRate, anzahlMutationen);
             } else {

@@ -18,24 +18,6 @@ class Population {
         this.hpModellPopulation = new ArrayList<HPModell>();
     }
 
-    // public void creatTestPop() {
-    // String[] sequenzes = {
-    // "HFPRPRHFPRHF", // Own Example = -2; 0 Overlaps
-    // "HFPRHFPRPRHLHLPRHFPLPRHLPRHLHLPRPRHFPRHF", // GA01 Example 1 = -4; 0
-    // Overlaps
-    // "HFPRHFPRPRHLHLPRHFPRPRHLPRHLHLPRPRHFPRHF", // GA01 Example 2 = -9; 0
-    // Overlaps
-    // "HLPLPFPLHLHRPRHF", // GAP00 Praktikum Faltung 1 = -2; 0 Overlaps
-    // "HFPLHLHFPRPRPRHF", // GAP00 Praktikum Faltung 2 = -3; 1 Overlap
-    // "PFPRPRPR", // Test = 0; 0 Overlaps
-    // "HFHRHRHRHRHRHRHRHFHLHLHLHF" // Test = -22; 9 Overlaps
-    // };
-    // for (String sequenz : sequenzes) {
-    // HPModell hpModell = new HPModell(sequenz);
-    // this.hpModellPopulation.add(hpModell);
-    // }
-    // }
-
     public void createFromSequenz(String currSeq, int anzahlPopulation) {
         HPModell.anzahlNodes = currSeq.length();
         String[] seq20permutations = new String[anzahlPopulation];
@@ -63,25 +45,6 @@ class Population {
             this.hpModellPopulation.add(hpModell);
         }
     }
-
-    // public void creatTestPop1() {
-    // String[] sequenzes = {
-    // "HLPLPFPLHLPLPFPL",
-    // "HLHRPRHFHLHRPRHF"
-    // };
-    // for (String sequenz : sequenzes) {
-    // HPModell hpModell = new HPModell(sequenz);
-    // this.hpModellPopulation.add(hpModell);
-    // }
-    // }
-
-    // public void createRandomPopulation(int size) {
-    // for (int i = 0; i < size; i++) {
-    // HPModell hpModell = new HPModell();
-    // hpModell.createRandomHPModell();
-    // this.hpModellPopulation.add(hpModell);
-    // }
-    // }
 
     public int getDiversity() {
         Set<String> set = new HashSet<String>();
@@ -201,23 +164,33 @@ class Population {
         int anzahl = this.hpModellPopulation.size();
         ArrayList<HPModell> newPopulation = new ArrayList<>();
         Random r = new Random();
+        int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten, maximal alle
+        double t = 0.90;
+        boolean searchForBest = (Math.random() < t); // 90% Chance, dass der beste gewinnt
+        // Reset aller Fitness-Werte
+        for (HPModell hpModell : this.hpModellPopulation) {
+            hpModell.resetFitness();
+        }
         for (int i = 0; i < anzahl; i++) {
-            // int result = r.nextInt(high-low) + low;
-            // Number between 2 and anzahl
-            int anzahlKandidaten = r.nextInt(anzahl - 2) + 2;
+
             Set<Integer> set = new HashSet<>();
             while (set.size() < anzahlKandidaten) {
                 set.add(r.nextInt(anzahl));
             }
-            ArrayList<Integer> list = new ArrayList<>(set);
-            Collections.sort(list);
-            HPModell bestHPModell = this.hpModellPopulation.get(list.get(0));
-            for (int j = 1; j < list.size(); j++) {
-                if (this.hpModellPopulation.get(list.get(j)).getFitness() > bestHPModell.getFitness()) {
-                    bestHPModell = this.hpModellPopulation.get(list.get(j));
+            HPModell tunierWinner = this.hpModellPopulation.get(set.iterator().next());
+            for (Integer j : set) {
+                // if (searchForBest) {
+                if (this.hpModellPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
+                    tunierWinner = this.hpModellPopulation.get(j);
                 }
+                // } else {
+                // if (this.hpModellPopulation.get(j).getFitness() < tunierWinner.getFitness())
+                // {
+                // tunierWinner = this.hpModellPopulation.get(j);
+                // }
+                // }
             }
-            HPModell hpModell = new HPModell(bestHPModell.toString());
+            HPModell hpModell = new HPModell(tunierWinner.toString());
             newPopulation.add(hpModell);
         }
         this.hpModellPopulation = newPopulation;

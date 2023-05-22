@@ -220,6 +220,9 @@ class HPModell {
     }
 
     public double getFitness() {
+        if (this.overlaps == -1 || this.hydroContacts == -1) {
+            this.calcFitness();
+        }
         double hydroContacts = this.hydroContacts;
         double overlaps = this.overlaps;
         return (hydroContacts) / (overlaps + 1);
@@ -344,5 +347,11 @@ class HPModell {
             e.printStackTrace();
             System.exit(0);
         }
+
+    }
+
+    public void resetFitness() {
+        this.overlaps = -1;
+        this.hydroContacts = -1;
     }
 }

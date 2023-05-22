@@ -10,6 +10,6 @@ run-prakt-2:
 run-prakt-3:
 	time java -cp BuildedFile.jar HP -i true -g 100 -n 100
 run-prakt-4:
-	time java -cp BuildedFile.jar HP -i true -g 100 -n 100 -s true
+	time java -cp BuildedFile.jar HP -i true -g 100 -n 100 -s true -t true
 clean:
 	rm -rf *.class Helpers/*.class BuildedFile.jar
