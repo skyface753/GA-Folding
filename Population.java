@@ -6,9 +6,9 @@ import java.util.Set;
 import Helpers.Helpers.RelDir;
 
 class Population {
-    private ArrayList<HPModell> hpModellPopulation;
+    private ArrayList<Faltung> hpModellPopulation;
     int generation = 0;
-    HPModell bestHPModell;
+    Faltung bestFaltung;
     double besteFitnessOverAll = 0;
     int anzahlHydroContactsOverAll = 0;
     int anzahlOverlapsOverAll = 0;
@@ -16,11 +16,11 @@ class Population {
     double sd = 0;
 
     public Population() {
-        this.hpModellPopulation = new ArrayList<HPModell>();
+        this.hpModellPopulation = new ArrayList<Faltung>();
     }
 
     public void createFromSequenz(String currSeq, int anzahlPopulation) {
-        HPModell.anzahlNodes = currSeq.length();
+        Faltung.anzahlNodes = currSeq.length();
         String[] seq20permutations = new String[anzahlPopulation];
         for (int i = 0; i < anzahlPopulation; i++) {
             seq20permutations[i] = "";
@@ -42,21 +42,21 @@ class Population {
         }
 
         for (int i = 0; i < anzahlPopulation; i++) {
-            HPModell hpModell = new HPModell(seq20permutations[i]);
+            Faltung hpModell = new Faltung(seq20permutations[i]);
             this.hpModellPopulation.add(hpModell);
         }
     }
 
     public int getDiversity() {
         Set<String> set = new HashSet<String>();
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             set.add(hpModell.toString());
         }
         return set.size();
     }
 
     public int mutation(double mutationRate) {
-        int anzahlMutationen = (int) (this.hpModellPopulation.size() * HPModell.anzahlNodes * mutationRate);
+        int anzahlMutationen = (int) (this.hpModellPopulation.size() * Faltung.anzahlNodes * mutationRate);
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
             int randomIndex = (int) (Math.random() * this.hpModellPopulation.size());
@@ -73,7 +73,7 @@ class Population {
         // Paarweise auswählen
         for (int i = 0; i < anzahlCrossover; i = i + 2) {
             if (i == anzahlCrossover - 1) {
-                // 50% Chance, dass das letzte HPModell auch noch ein Crossover bekommt
+                // 50% Chance, dass die letzte Faltung auch noch ein Crossover bekommt
                 if (Math.random() < 0.5)
                     break;
             }
@@ -83,18 +83,18 @@ class Population {
             while (randomIndex1 == randomIndex2) {
                 randomIndex2 = (int) (Math.random() * this.hpModellPopulation.size());
             }
-            HPModell hpModell1 = this.hpModellPopulation.get(randomIndex1);
-            HPModell hpModell2 = this.hpModellPopulation.get(randomIndex2);
+            Faltung hpModell1 = this.hpModellPopulation.get(randomIndex1);
+            Faltung hpModell2 = this.hpModellPopulation.get(randomIndex2);
             RelDir[] relDirs1 = hpModell1.getDirections();
             RelDir[] relDirs2 = hpModell2.getDirections();
-            RelDir[] relDirs1New = new RelDir[HPModell.anzahlNodes];
-            RelDir[] relDirs2New = new RelDir[HPModell.anzahlNodes];
-            int cutIndex = (int) (Math.random() * HPModell.anzahlNodes);
+            RelDir[] relDirs1New = new RelDir[Faltung.anzahlNodes];
+            RelDir[] relDirs2New = new RelDir[Faltung.anzahlNodes];
+            int cutIndex = (int) (Math.random() * Faltung.anzahlNodes);
             for (int j = 0; j < cutIndex; j++) {
                 relDirs1New[j] = relDirs1[j];
                 relDirs2New[j] = relDirs2[j];
             }
-            for (int j = cutIndex; j < HPModell.anzahlNodes; j++) {
+            for (int j = cutIndex; j < Faltung.anzahlNodes; j++) {
                 relDirs1New[j] = relDirs2[j];
                 relDirs2New[j] = relDirs1[j];
             }
@@ -105,7 +105,7 @@ class Population {
     }
 
     public void allToImages() {
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             hpModell.exportAsImage(generation);
         }
     }
@@ -115,22 +115,13 @@ class Population {
         avgFitness = 0;
         int firstIndex = 0;
         this.hpModellPopulation.get(firstIndex).calcFitness();
-        bestHPModell = this.hpModellPopulation.get(firstIndex);
-        // while (bestHPModell.getOverlaps() > 0) {
-        // firstIndex++;
-        // if (firstIndex >= this.hpModellPopulation.size()) {
-        // System.out.println("No HPModell without overlaps found!");
-        // System.exit(0);
-        // }
+        bestFaltung = this.hpModellPopulation.get(firstIndex);
 
-        // this.hpModellPopulation.get(firstIndex).calcFitness();
-        // bestHPModell = this.hpModellPopulation.get(firstIndex);
-        // }
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             hpModell.calcFitness();
             avgFitness += hpModell.getFitness();
-            if (hpModell.getFitness() > bestHPModell.getFitness()) {
-                bestHPModell = hpModell;
+            if (hpModell.getFitness() > bestFaltung.getFitness()) {
+                bestFaltung = hpModell;
             }
             if (hpModell.getFitness() > this.besteFitnessOverAll) {
                 this.besteFitnessOverAll = hpModell.getFitness();
@@ -151,19 +142,19 @@ class Population {
         // standard deviation
         // double sd = 0;
         // double avgFitness = 0;
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             hpModell.calcFitness();
             avgFitness += hpModell.getFitness();
         }
         avgFitness = avgFitness / this.hpModellPopulation.size();
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             sd += Math.pow(hpModell.getFitness() - avgFitness, 2);
         }
         sd = Math.sqrt(sd / this.hpModellPopulation.size());
         // System.out.println("sd: " + sd);
         double c = 2;
         // f` = max(f-(avgFitness-c*sd),0)
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             double fitness = hpModell.getFitness();
             fitness = Math.max(fitness - (avgFitness - c * sd), 0);
             hpModell.fitnessScaled = fitness;
@@ -189,14 +180,14 @@ class Population {
             // randomSelector.add(this.hpModellPopulation.get(i).getFitness(),
             // this.hpModellPopulation.get(i).toString());
         }
-        ArrayList<HPModell> newPopulation = new ArrayList<>();
+        ArrayList<Faltung> newPopulation = new ArrayList<>();
         int anzahl = this.hpModellPopulation.size();
         if (elitismus) {
             anzahl--;
-            newPopulation.add(new HPModell(bestHPModell.toString()));
+            newPopulation.add(new Faltung(bestFaltung.toString()));
         }
         for (int i = 0; i < anzahl; i++) {
-            HPModell hpModell = new HPModell(randomSelector.next());
+            Faltung hpModell = new Faltung(randomSelector.next());
             newPopulation.add(hpModell);
         }
 
@@ -206,7 +197,7 @@ class Population {
 
     public Population turnierSelection(boolean elitismus) {
         int anzahl = this.hpModellPopulation.size();
-        ArrayList<HPModell> newPopulation = new ArrayList<>();
+        ArrayList<Faltung> newPopulation = new ArrayList<>();
         Random r = new Random();
         int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten, maximal alle
         double t = 0.90;
@@ -217,10 +208,10 @@ class Population {
 
         if (elitismus) {
             anzahl--;
-            newPopulation.add(new HPModell(bestHPModell.toString()));
+            newPopulation.add(new Faltung(bestFaltung.toString()));
         }
         // Reset aller Fitness-Werte
-        for (HPModell hpModell : this.hpModellPopulation) {
+        for (Faltung hpModell : this.hpModellPopulation) {
             hpModell.resetFitness();
         }
         for (int i = 0; i < anzahl; i++) {
@@ -229,7 +220,7 @@ class Population {
             while (set.size() < anzahlKandidaten) {
                 set.add(r.nextInt(anzahl));
             }
-            HPModell tunierWinner = this.hpModellPopulation.get(set.iterator().next());
+            Faltung tunierWinner = this.hpModellPopulation.get(set.iterator().next());
             for (Integer j : set) {
                 if (searchForBest) {
                     if (this.hpModellPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
@@ -241,7 +232,7 @@ class Population {
                     }
                 }
             }
-            HPModell hpModell = new HPModell(tunierWinner.toString());
+            Faltung hpModell = new Faltung(tunierWinner.toString());
             newPopulation.add(hpModell);
         }
         this.hpModellPopulation = newPopulation;
@@ -249,10 +240,10 @@ class Population {
     }
 
     public void exportBestAsImage() {
-        this.bestHPModell.exportAsImage(generation);
+        this.bestFaltung.exportAsImage(generation);
     }
 
-    public int anzahlHPModelle() {
+    public int anzahlFaltungen() {
         return this.hpModellPopulation.size();
     }
 

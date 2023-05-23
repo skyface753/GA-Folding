@@ -201,9 +201,9 @@ public class HP {
         addStatistik(avgFitness, 0, 0);
         System.out.println("Sequenz: " + seq);
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
-        System.out.println("Beste Fitness: " + p.bestHPModell.getFitness());
-        System.out.println("Beste Directions: " + RelDir.toString(p.bestHPModell.getDirections()));
-        System.out.println("Beste Sequenz: " + p.bestHPModell.toString());
+        System.out.println("Beste Fitness: " + p.bestFaltung.getFitness());
+        System.out.println("Beste Directions: " + RelDir.toString(p.bestFaltung.getDirections()));
+        System.out.println("Beste Sequenz: " + p.bestFaltung.toString());
         System.out.println("----------------------");
 
         try {
@@ -215,17 +215,17 @@ public class HP {
 
     private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen) {
         String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
-                "" + p.bestHPModell.getFitness(),
+                "" + p.bestFaltung.getFitness(),
                 "" + p.besteFitnessOverAll,
-                "" + p.bestHPModell.getHydroContacts(),
-                "" + p.bestHPModell.getOverlaps(),
+                "" + p.bestFaltung.getHydroContacts(),
+                "" + p.bestFaltung.getOverlaps(),
                 "" + p.anzahlHydroContactsOverAll,
                 "" + p.anzahlOverlapsOverAll,
                 "" + mutationRate,
                 "" + anzahlMutationen,
                 "" + p.getDiversity(),
-                "" + RelDir.toString(p.bestHPModell.getDirections()),
-                "" + p.bestHPModell.toString() };
+                "" + RelDir.toString(p.bestFaltung.getDirections()),
+                "" + p.bestFaltung.toString() };
         dataLines.add(newLine);
     }
 }
