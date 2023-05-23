@@ -112,11 +112,24 @@ class Population {
 
     public double evaluation() {
         // double avgFitness = 0;
-        bestHPModell = this.hpModellPopulation.get(0);
+        avgFitness = 0;
+        int firstIndex = 0;
+        this.hpModellPopulation.get(firstIndex).calcFitness();
+        bestHPModell = this.hpModellPopulation.get(firstIndex);
+        // while (bestHPModell.getOverlaps() > 0) {
+        // firstIndex++;
+        // if (firstIndex >= this.hpModellPopulation.size()) {
+        // System.out.println("No HPModell without overlaps found!");
+        // System.exit(0);
+        // }
+
+        // this.hpModellPopulation.get(firstIndex).calcFitness();
+        // bestHPModell = this.hpModellPopulation.get(firstIndex);
+        // }
         for (HPModell hpModell : this.hpModellPopulation) {
             hpModell.calcFitness();
             avgFitness += hpModell.getFitness();
-            if (hpModell.getFitness() > bestHPModell.getFitness() && hpModell.getOverlaps() == 0) {
+            if (hpModell.getFitness() > bestHPModell.getFitness()) {
                 bestHPModell = hpModell;
             }
             if (hpModell.getFitness() > this.besteFitnessOverAll) {
