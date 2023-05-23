@@ -268,8 +268,11 @@ class HPModell {
             return;
         }
 
-        int height = 2000;
-        int width = 2000;
+        int anzahlNodes = this.proteins.size();
+
+        // int height = 2000;
+        int height = anzahlNodes * 50 * 2;
+        int width = height;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -284,8 +287,8 @@ class HPModell {
         g2.drawString("Fitness: " + this.getFitness(), 10, 60);
 
         int cellSize = 50;
-        int x = 1000;
-        int y = 1000;
+        int x = anzahlNodes * 50;
+        int y = anzahlNodes * 50;
         H_Richtung lastH_Richtung = H_Richtung.Nord; // Starting direction
         for (int i = 0; i < this.proteins.size(); i++) {
             Node currentNode = this.proteins.get(i);
