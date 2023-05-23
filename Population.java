@@ -104,17 +104,6 @@ class Population {
         }
     }
 
-    // public void printModel() {
-    // for (HPModell hpModell : this.hpModellPopulation) {
-    // // hpModell.printPopulation();
-    // hpModell.calcFitness();
-    // System.out.println("HydroContacts: " + hpModell.getHydroContacts());
-    // System.out.println("Overlaps: " + hpModell.getOverlaps());
-    // System.out.println("Fitness: " + hpModell.getFitness());
-    // System.out.println();
-    // }
-    // }
-
     public void allToImages() {
         for (HPModell hpModell : this.hpModellPopulation) {
             hpModell.exportAsImage(generation);

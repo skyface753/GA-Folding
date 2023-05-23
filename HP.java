@@ -33,52 +33,50 @@ public class HP {
         boolean withElitism = false;
         if (args.length == 1) {
             if (args[0].equals("-h")) {
-                System.out.println("Usage: java HP -c true -i false -p 20 -g 100 -n 100");
-                System.out.println("  -c true|false: with or without crossover and mutation (default: true)");
-                System.out.println("  -i true|false: with or without image output (default: false)");
-                System.out.println("  -g 100: number of generations");
-                System.out.println("  -n 100: number of population");
-                System.out.println("  -m 0.01: mutation rate");
-                System.out.println("  -s true|false: scale mutation rate (default: false)");
-                System.out.println("  -t true|false: tunier selection (default: false)");
-                System.out.println("  -o true|false: with sigma (σ) scaling (default: false)");
-                System.out.println("  -e true|false: with elitism (default: false)");
-                System.out.println("  -h: help");
+                System.out.println(
+                        "Usage: java HP --crossover true --image false --generations 100 --population 100 --mutationrate 0.01 --scalemutate false --tunier false --sigmascaling false --elitism false");
+                System.out.println("  --crossover true|false: with or without crossover and mutation (default: true)");
+                System.out.println("  --image true|false: with or without image output (default: false)");
+                System.out.println("  --generations 100: number of generations");
+                System.out.println("  --population 100: number of population");
+                System.out.println("  --mutationrate 0.01: mutation rate");
+                System.out.println("  --scalemutate true|false: scale mutation rate (default: false)");
+                System.out.println("  --tunier true|false: tunier selection (default: false)");
+                System.out.println("  --sigmascaling true|false: with sigma (σ) scaling (default: false)");
+                System.out.println("  --elitism true|false: with elitism (default: false)");
+                System.out.println("  --help: help");
                 return;
-                // } else if (args[0].equals("-t")) {
-                // hp.test();
-                // return;
             }
         }
         for (int i = 0; i < args.length; i = i + 2) {
             String arg = args[i];
             String value = args[i + 1];
             switch (arg) {
-                case "-c":
+                case "--crossover":
                     withCrossAndMutation = Boolean.parseBoolean(value);
                     break;
-                case "-i":
+                case "--image":
                     imageOutput = Boolean.parseBoolean(value);
                     break;
-                case "-g":
+                case "--generations":
                     anzahlGenerationen = Integer.parseInt(value);
                     break;
-                case "-n":
+                case "--population":
                     anzahlPopulation = Integer.parseInt(value);
                     break;
-                case "-m":
+                case "--mutationrate":
                     mutationRate = Double.parseDouble(value);
                     break;
-                case "-s":
+                case "--scalemutate":
                     scaleMutationRate = Boolean.parseBoolean(value);
                     break;
-                case "-t":
+                case "--tunier":
                     tunierSelection = Boolean.parseBoolean(value);
                     break;
-                case "-o":
+                case "--sigmascaling":
                     withSigmaScaling = Boolean.parseBoolean(value);
                     break;
-                case "-e":
+                case "--elitism":
                     withElitism = Boolean.parseBoolean(value);
                     break;
                 default:
@@ -96,6 +94,7 @@ public class HP {
         System.out.println("tunierSelection: " + tunierSelection);
         System.out.println("withSigmaScaling: " + withSigmaScaling);
         System.out.println("withElitism: " + withElitism);
+        System.out.println("Folder: " + HP.outputFolderPrefix);
         System.out.println("----------------------");
         hp.test(withCrossAndMutation, imageOutput, anzahlGenerationen, anzahlPopulation, mutationRate,
                 scaleMutationRate,
@@ -110,13 +109,14 @@ public class HP {
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
             double mutationRate, boolean scaleMutationRate, boolean tunierSelection, boolean withSigmaScaling,
             boolean withElitism) {
-        String SEQ20 = "10100110100101100101";
-        String SEQ24 = "110010010010010010010011";
+        // String SEQ20 = "10100110100101100101";
+        // String SEQ24 = "110010010010010010010011";
         String SEQ25 = "0010011000011000011000011";
-        String SEQ36 = "000110011000001111111001100001100100";
-        String SEQ48 = "001001100110000011111111110000001100110010011111";
-        String SEQ50 = "11010101011110100010001000010001000101111010101011";
-        String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        // String SEQ36 = "000110011000001111111001100001100100";
+        // String SEQ48 = "001001100110000011111111110000001100110010011111";
+        // String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        // String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        String[] seqs = { SEQ25 };
         for (String seq : seqs) {
             genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, scaleMutationRate,
                     tunierSelection, withSigmaScaling, withElitism, seq);
@@ -197,7 +197,6 @@ public class HP {
             }
 
             avgFitness = p.evaluation();
-            // p.sigmaScale();
         }
         addStatistik(avgFitness, 0, 0);
         System.out.println("Sequenz: " + seq);
