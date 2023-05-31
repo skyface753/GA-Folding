@@ -173,6 +173,10 @@ public class HP {
                         "BestSequenz" }); // csv
         // header
         double mutationRate = initMutationRate;
+        if (!withCrossAndMutation) {
+            mutationRate = 0;
+        }
+        int anzahlMutationen = 0;
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
 
@@ -185,10 +189,7 @@ public class HP {
                 mutationRate = scaleMutationRate
                         ? (initMutationRate * (1 - (double) p.generation / maxGeneration) + 0.01) // scale mutation rate
                         : initMutationRate;
-                int anzahlMutationen = p.mutation(mutationRate);
-                addStatistik(avgFitness, mutationRate, anzahlMutationen);
-            } else {
-                addStatistik(avgFitness, 0, 0);
+                anzahlMutationen = p.mutation(mutationRate);
             }
             if (tunierSelection) {
                 p = p.turnierSelection(withElitism); // turnier selection
@@ -197,13 +198,14 @@ public class HP {
             }
 
             avgFitness = p.evaluation();
+            addStatistik(avgFitness, mutationRate, anzahlMutationen);
         }
-        addStatistik(avgFitness, 0, 0);
+        // addStatistik(avgFitness, );
         System.out.println("Sequenz: " + seq);
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
-        System.out.println("Beste Fitness: " + p.bestFaltung.getFitness());
-        System.out.println("Beste Directions: " + RelDir.toString(p.bestFaltung.getDirections()));
-        System.out.println("Beste Sequenz: " + p.bestFaltung.toString());
+        System.out.println("Beste Fitness: " + p.bestFolding.getFitness());
+        System.out.println("Beste Directions: " + RelDir.toString(p.bestFolding.getDirections()));
+        System.out.println("Beste Sequenz: " + p.bestFolding.toString());
         System.out.println("----------------------");
 
         try {
@@ -215,17 +217,17 @@ public class HP {
 
     private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen) {
         String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
-                "" + p.bestFaltung.getFitness(),
+                "" + p.bestFolding.getFitness(),
                 "" + p.besteFitnessOverAll,
-                "" + p.bestFaltung.getHydroContacts(),
-                "" + p.bestFaltung.getOverlaps(),
+                "" + p.bestFolding.getHydroContacts(),
+                "" + p.bestFolding.getOverlaps(),
                 "" + p.anzahlHydroContactsOverAll,
                 "" + p.anzahlOverlapsOverAll,
                 "" + mutationRate,
                 "" + anzahlMutationen,
                 "" + p.getDiversity(),
-                "" + RelDir.toString(p.bestFaltung.getDirections()),
-                "" + p.bestFaltung.toString() };
+                "" + RelDir.toString(p.bestFolding.getDirections()),
+                "" + p.bestFolding.toString() };
         dataLines.add(newLine);
     }
 }

@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 import static Helpers.Helpers.RelDir;
 import static Helpers.Helpers.H_Richtung;
 
-class Faltung {
+class Folding {
     private ArrayList<Node> proteins;
     private int hydroContacts;
     private int overlaps;
@@ -27,12 +27,12 @@ class Faltung {
         return this.proteins;
     }
 
-    public Faltung() {
+    public Folding() {
         this.proteins = new ArrayList<Node>();
 
     }
 
-    public Faltung(String sequenz) {
+    public Folding(String sequenz) {
         this.proteins = new ArrayList<Node>();
         this.createFromSequenz(sequenz);
     }

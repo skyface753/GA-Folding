@@ -6,9 +6,9 @@ import java.util.Set;
 import Helpers.Helpers.RelDir;
 
 class Population {
-    private ArrayList<Faltung> hpModellPopulation;
+    private ArrayList<Folding> foldingPopulation;
     int generation = 0;
-    Faltung bestFaltung;
+    Folding bestFolding;
     double besteFitnessOverAll = 0;
     int anzahlHydroContactsOverAll = 0;
     int anzahlOverlapsOverAll = 0;
@@ -16,11 +16,11 @@ class Population {
     double sd = 0;
 
     public Population() {
-        this.hpModellPopulation = new ArrayList<Faltung>();
+        this.foldingPopulation = new ArrayList<Folding>();
     }
 
     public void createFromSequenz(String currSeq, int anzahlPopulation) {
-        Faltung.anzahlNodes = currSeq.length();
+        Folding.anzahlNodes = currSeq.length();
         String[] seq20permutations = new String[anzahlPopulation];
         for (int i = 0; i < anzahlPopulation; i++) {
             seq20permutations[i] = "";
@@ -42,71 +42,72 @@ class Population {
         }
 
         for (int i = 0; i < anzahlPopulation; i++) {
-            Faltung hpModell = new Faltung(seq20permutations[i]);
-            this.hpModellPopulation.add(hpModell);
+            Folding folding = new Folding(seq20permutations[i]);
+            this.foldingPopulation.add(folding);
         }
     }
 
     public int getDiversity() {
         Set<String> set = new HashSet<String>();
-        for (Faltung hpModell : this.hpModellPopulation) {
-            set.add(hpModell.toString());
+        for (Folding folding : this.foldingPopulation) {
+            set.add(folding.toString());
         }
         return set.size();
     }
 
     public int mutation(double mutationRate) {
-        int anzahlMutationen = (int) (this.hpModellPopulation.size() * Faltung.anzahlNodes * mutationRate);
+        // int anzahlDirections = (int) (this.)
+        int anzahlMutationen = (int) (this.foldingPopulation.size() * Folding.anzahlNodes * mutationRate);
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
-            int randomIndex = (int) (Math.random() * this.hpModellPopulation.size());
-            this.hpModellPopulation.get(randomIndex).mutateDirection();
+            int randomIndex = (int) (Math.random() * this.foldingPopulation.size());
+            this.foldingPopulation.get(randomIndex).mutateDirection();
         }
         return anzahlMutationen;
     }
 
     public void crossover() {
         // 25% der Population
-        int anzahlCrossover = (int) (this.hpModellPopulation.size() * 0.25);
+        int anzahlCrossover = (int) (this.foldingPopulation.size() * 0.25);
         anzahlCrossover = Math.max(1, anzahlCrossover); // mindestens 1 Crossover
 
         // Paarweise auswählen
         for (int i = 0; i < anzahlCrossover; i = i + 2) {
             if (i == anzahlCrossover - 1) {
-                // 50% Chance, dass die letzte Faltung auch noch ein Crossover bekommt
+                // 50% Chance, dass die letzte Folding auch noch ein Crossover bekommt
                 if (Math.random() < 0.5)
                     break;
             }
-            int randomIndex1 = (int) (Math.random() * this.hpModellPopulation.size());
+            int randomIndex1 = (int) (Math.random() * this.foldingPopulation.size());
 
-            int randomIndex2 = (int) (Math.random() * this.hpModellPopulation.size());
+            int randomIndex2 = (int) (Math.random() * this.foldingPopulation.size());
             while (randomIndex1 == randomIndex2) {
-                randomIndex2 = (int) (Math.random() * this.hpModellPopulation.size());
+                randomIndex2 = (int) (Math.random() * this.foldingPopulation.size());
             }
-            Faltung hpModell1 = this.hpModellPopulation.get(randomIndex1);
-            Faltung hpModell2 = this.hpModellPopulation.get(randomIndex2);
-            RelDir[] relDirs1 = hpModell1.getDirections();
-            RelDir[] relDirs2 = hpModell2.getDirections();
-            RelDir[] relDirs1New = new RelDir[Faltung.anzahlNodes];
-            RelDir[] relDirs2New = new RelDir[Faltung.anzahlNodes];
-            int cutIndex = (int) (Math.random() * Faltung.anzahlNodes);
+            Folding folding1 = this.foldingPopulation.get(randomIndex1);
+            Folding folding2 = this.foldingPopulation.get(randomIndex2);
+            RelDir[] relDirs1 = folding1.getDirections();
+            RelDir[] relDirs2 = folding2.getDirections();
+            RelDir[] relDirs1New = new RelDir[Folding.anzahlNodes];
+            RelDir[] relDirs2New = new RelDir[Folding.anzahlNodes];
+            int cutIndex = (int) (Math.random() * Folding.anzahlNodes);
             for (int j = 0; j < cutIndex; j++) {
                 relDirs1New[j] = relDirs1[j];
                 relDirs2New[j] = relDirs2[j];
             }
-            for (int j = cutIndex; j < Faltung.anzahlNodes; j++) {
+            for (int j = cutIndex; j < Folding.anzahlNodes; j++) {
                 relDirs1New[j] = relDirs2[j];
                 relDirs2New[j] = relDirs1[j];
             }
-            hpModell1.setDirections(relDirs1New);
-            hpModell2.setDirections(relDirs2New);
+            folding1.setDirections(relDirs1New);
+            folding2.setDirections(relDirs2New);
 
         }
     }
 
     public void allToImages() {
-        for (Faltung hpModell : this.hpModellPopulation) {
-            hpModell.exportAsImage(generation);
+        for (Folding folding : this.foldingPopulation) {
+            folding.exportAsImage(generation);
         }
     }
 
@@ -114,26 +115,26 @@ class Population {
         // double avgFitness = 0;
         avgFitness = 0;
         int firstIndex = 0;
-        this.hpModellPopulation.get(firstIndex).calcFitness();
-        bestFaltung = this.hpModellPopulation.get(firstIndex);
+        this.foldingPopulation.get(firstIndex).calcFitness();
+        bestFolding = this.foldingPopulation.get(firstIndex);
 
-        for (Faltung hpModell : this.hpModellPopulation) {
-            hpModell.calcFitness();
-            avgFitness += hpModell.getFitness();
-            if (hpModell.getFitness() > bestFaltung.getFitness()) {
-                bestFaltung = hpModell;
+        for (Folding folding : this.foldingPopulation) {
+            folding.calcFitness();
+            avgFitness += folding.getFitness();
+            if (folding.getFitness() > bestFolding.getFitness()) {
+                bestFolding = folding;
             }
-            if (hpModell.getFitness() > this.besteFitnessOverAll) {
-                this.besteFitnessOverAll = hpModell.getFitness();
+            if (folding.getFitness() > this.besteFitnessOverAll) {
+                this.besteFitnessOverAll = folding.getFitness();
             }
-            if (hpModell.getHydroContacts() > this.anzahlHydroContactsOverAll) {
-                this.anzahlHydroContactsOverAll = hpModell.getHydroContacts();
+            if (folding.getHydroContacts() > this.anzahlHydroContactsOverAll) {
+                this.anzahlHydroContactsOverAll = folding.getHydroContacts();
             }
-            if (hpModell.getOverlaps() > this.anzahlOverlapsOverAll) {
-                this.anzahlOverlapsOverAll = hpModell.getOverlaps();
+            if (folding.getOverlaps() > this.anzahlOverlapsOverAll) {
+                this.anzahlOverlapsOverAll = folding.getOverlaps();
             }
         }
-        avgFitness = avgFitness / this.hpModellPopulation.size();
+        avgFitness = avgFitness / this.foldingPopulation.size();
         // this.avgFitness = avgFitness;
         return avgFitness;
     }
@@ -142,22 +143,22 @@ class Population {
         // standard deviation
         // double sd = 0;
         // double avgFitness = 0;
-        for (Faltung hpModell : this.hpModellPopulation) {
-            hpModell.calcFitness();
-            avgFitness += hpModell.getFitness();
+        for (Folding folding : this.foldingPopulation) {
+            folding.calcFitness();
+            avgFitness += folding.getFitness();
         }
-        avgFitness = avgFitness / this.hpModellPopulation.size();
-        for (Faltung hpModell : this.hpModellPopulation) {
-            sd += Math.pow(hpModell.getFitness() - avgFitness, 2);
+        avgFitness = avgFitness / this.foldingPopulation.size();
+        for (Folding folding : this.foldingPopulation) {
+            sd += Math.pow(folding.getFitness() - avgFitness, 2);
         }
-        sd = Math.sqrt(sd / this.hpModellPopulation.size());
+        sd = Math.sqrt(sd / this.foldingPopulation.size());
         // System.out.println("sd: " + sd);
         double c = 2;
         // f` = max(f-(avgFitness-c*sd),0)
-        for (Faltung hpModell : this.hpModellPopulation) {
-            double fitness = hpModell.getFitness();
+        for (Folding folding : this.foldingPopulation) {
+            double fitness = folding.getFitness();
             fitness = Math.max(fitness - (avgFitness - c * sd), 0);
-            hpModell.fitnessScaled = fitness;
+            folding.fitnessScaled = fitness;
         }
     }
 
@@ -166,38 +167,38 @@ class Population {
         if (withSigmaScaling) {
             sigmaScale();
         }
-        for (int i = 0; i < this.hpModellPopulation.size(); i++) {
+        for (int i = 0; i < this.foldingPopulation.size(); i++) {
             if (withSigmaScaling) {
                 // 1 + (fitnessScaled - avgFitness) / (2 * sd)
-                double fitnessScaled = this.hpModellPopulation.get(i).fitnessScaled;
+                double fitnessScaled = this.foldingPopulation.get(i).fitnessScaled;
                 double expValue = Math.max(1 + (fitnessScaled - avgFitness) / (2 * sd), 0.1);
-                randomSelector.add(expValue, this.hpModellPopulation.get(i).toString());
+                randomSelector.add(expValue, this.foldingPopulation.get(i).toString());
             } else {
-                this.hpModellPopulation.get(i).calcFitness();
-                randomSelector.add(this.hpModellPopulation.get(i).getFitness(),
-                        this.hpModellPopulation.get(i).toString());
+                this.foldingPopulation.get(i).calcFitness();
+                randomSelector.add(this.foldingPopulation.get(i).getFitness(),
+                        this.foldingPopulation.get(i).toString());
             }
-            // randomSelector.add(this.hpModellPopulation.get(i).getFitness(),
-            // this.hpModellPopulation.get(i).toString());
+            // randomSelector.add(this.foldingPopulation.get(i).getFitness(),
+            // this.foldingPopulation.get(i).toString());
         }
-        ArrayList<Faltung> newPopulation = new ArrayList<>();
-        int anzahl = this.hpModellPopulation.size();
+        ArrayList<Folding> newPopulation = new ArrayList<>();
+        int anzahl = this.foldingPopulation.size();
         if (elitismus) {
             anzahl--;
-            newPopulation.add(new Faltung(bestFaltung.toString()));
+            newPopulation.add(new Folding(bestFolding.toString()));
         }
         for (int i = 0; i < anzahl; i++) {
-            Faltung hpModell = new Faltung(randomSelector.next());
-            newPopulation.add(hpModell);
+            Folding folding = new Folding(randomSelector.next());
+            newPopulation.add(folding);
         }
 
-        this.hpModellPopulation = newPopulation;
+        this.foldingPopulation = newPopulation;
         return this;
     }
 
     public Population turnierSelection(boolean elitismus) {
-        int anzahl = this.hpModellPopulation.size();
-        ArrayList<Faltung> newPopulation = new ArrayList<>();
+        int anzahl = this.foldingPopulation.size();
+        ArrayList<Folding> newPopulation = new ArrayList<>();
         Random r = new Random();
         int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten, maximal alle
         double t = 0.90;
@@ -208,11 +209,11 @@ class Population {
 
         if (elitismus) {
             anzahl--;
-            newPopulation.add(new Faltung(bestFaltung.toString()));
+            newPopulation.add(new Folding(bestFolding.toString()));
         }
         // Reset aller Fitness-Werte
-        for (Faltung hpModell : this.hpModellPopulation) {
-            hpModell.resetFitness();
+        for (Folding folding : this.foldingPopulation) {
+            folding.resetFitness();
         }
         for (int i = 0; i < anzahl; i++) {
 
@@ -220,31 +221,31 @@ class Population {
             while (set.size() < anzahlKandidaten) {
                 set.add(r.nextInt(anzahl));
             }
-            Faltung tunierWinner = this.hpModellPopulation.get(set.iterator().next());
+            Folding tunierWinner = this.foldingPopulation.get(set.iterator().next());
             for (Integer j : set) {
                 if (searchForBest) {
-                    if (this.hpModellPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
-                        tunierWinner = this.hpModellPopulation.get(j);
+                    if (this.foldingPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
+                        tunierWinner = this.foldingPopulation.get(j);
                     }
                 } else {
-                    if (this.hpModellPopulation.get(j).getFitness() < tunierWinner.getFitness()) {
-                        tunierWinner = this.hpModellPopulation.get(j);
+                    if (this.foldingPopulation.get(j).getFitness() < tunierWinner.getFitness()) {
+                        tunierWinner = this.foldingPopulation.get(j);
                     }
                 }
             }
-            Faltung hpModell = new Faltung(tunierWinner.toString());
-            newPopulation.add(hpModell);
+            Folding folding = new Folding(tunierWinner.toString());
+            newPopulation.add(folding);
         }
-        this.hpModellPopulation = newPopulation;
+        this.foldingPopulation = newPopulation;
         return this;
     }
 
     public void exportBestAsImage() {
-        this.bestFaltung.exportAsImage(generation);
+        this.bestFolding.exportAsImage(generation);
     }
 
-    public int anzahlFaltungen() {
-        return this.hpModellPopulation.size();
+    public int anzahlFoldingen() {
+        return this.foldingPopulation.size();
     }
 
 }
