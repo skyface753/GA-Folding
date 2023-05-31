@@ -56,12 +56,14 @@ class Population {
     }
 
     public int mutation(double mutationRate) {
-        // int anzahlDirections = (int) (this.)
+        int anzahlDirections = (int) (this.foldingPopulation.size() * Folding.anzahlNodes);
         int anzahlMutationen = (int) (this.foldingPopulation.size() * Folding.anzahlNodes * mutationRate);
         anzahlMutationen = Math.max(1, anzahlMutationen); // mindestens 1 Mutation
         for (int i = 0; i < anzahlMutationen; i++) {
-            int randomIndex = (int) (Math.random() * this.foldingPopulation.size());
-            this.foldingPopulation.get(randomIndex).mutateDirection();
+            int randomIndexPlusOffset = (int) (Math.random() * anzahlDirections);
+            int randomIndex = randomIndexPlusOffset % Folding.anzahlNodes;
+            int randomOffset = randomIndexPlusOffset / Folding.anzahlNodes;
+            this.foldingPopulation.get(randomOffset).mutateDirection(randomIndex);
         }
         return anzahlMutationen;
     }

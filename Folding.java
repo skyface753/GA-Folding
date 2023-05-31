@@ -72,8 +72,7 @@ class Folding {
         }
     }
 
-    public void mutateDirection() {
-        int index = (int) (Math.random() * this.proteins.size());
+    public void mutateDirection(int index) {
         Node node = this.proteins.get(index);
         int plusorminus = (int) (Math.random() * 2);
         int newDirection = 0;
