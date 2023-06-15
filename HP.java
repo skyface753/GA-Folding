@@ -142,6 +142,7 @@ public class HP {
 
     public void givenDataArray_whenConvertToCSV_thenOutputCreated() throws IOException {
         File csvOutputFile = new File(HP.outputFolder + "output.csv");
+        System.out.println("Writing to: " + csvOutputFile.getAbsolutePath());
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataLines.stream()
                     .map(this::convertToCSV)

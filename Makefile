@@ -10,7 +10,7 @@ run-prakt-2:
 run-prakt-3:
 	time java -cp BuildedFile.jar HP --image true --generations 100 --population 100
 run-prakt-4:
-	time java -cp BuildedFile.jar HP --image true --generations 100 --population 100 --scalemutate true --tunier true
+	time java -cp BuildedFile.jar HP --image false --generations 100 --population 100 --scalemutate true --tunier true --mutationrate 0.1
 
 run-test-all-params-default:
 	time java -cp BuildedFile.jar HP --crossover true --image false --generations 100 --population 100 --mutationrate 0.01 --scalemutate false --tunier false --sigmascaling false --elitism false

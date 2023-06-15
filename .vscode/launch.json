@@ -17,6 +17,14 @@
       "request": "launch",
       "mainClass": "HP",
       "projectName": "GA-Praktikum_3b0f189e"
+    },
+    {
+      "type": "java",
+      "name": "Tunier",
+      "request": "launch",
+      "mainClass": "HP",
+      "projectName": "GA-Praktikum_3b0f189e",
+      "args": "--tunier true"
     }
   ]
 }
