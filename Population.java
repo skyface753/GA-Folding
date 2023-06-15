@@ -202,7 +202,9 @@ class Population {
         int anzahl = this.foldingPopulation.size();
         ArrayList<Folding> newPopulation = new ArrayList<>();
         Random r = new Random();
-        int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten, maximal alle
+        // int anzahlKandidaten = r.nextInt(anzahl - 2) + 2; // mindestens 2 Kandidaten,
+        // maximal alle
+        int anzahlKandidaten = 7; // Kandidaten pro Turnier
         double t = 0.90;
         boolean searchForBest = true;
         if (anzahlKandidaten == 2 && (Math.random() > t)) {
@@ -220,10 +222,11 @@ class Population {
         for (int i = 0; i < anzahl; i++) {
 
             Set<Integer> set = new HashSet<>();
-            while (set.size() < anzahlKandidaten) {
+            while (set.size() < anzahlKandidaten) { // solange Kandidaten auswählen, bis genug da sind
                 set.add(r.nextInt(anzahl));
             }
-            Folding tunierWinner = this.foldingPopulation.get(set.iterator().next());
+            Folding tunierWinner = this.foldingPopulation.get(set.iterator().next()); // erstes Element als
+                                                                                      // Vergleichswert
             for (Integer j : set) {
                 if (searchForBest) {
                     if (this.foldingPopulation.get(j).getFitness() > tunierWinner.getFitness()) {
