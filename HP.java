@@ -170,6 +170,7 @@ public class HP {
                         "BestOverlaps", "HydroContactsOverAll", "OverlapsOverAll",
                         "MutationRate",
                         "AnzahlMutationen",
+                        "Standardabweichung",
                         "Diversity", "BestDirections",
                         "BestSequenz" }); // csv
         // header
@@ -178,6 +179,7 @@ public class HP {
             mutationRate = 0;
         }
         int anzahlMutationen = 0;
+        double standardabweichung = 0;
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
 
@@ -187,9 +189,19 @@ public class HP {
             p.generation++;
             if (withCrossAndMutation) {
                 p.crossover();
-                mutationRate = scaleMutationRate
-                        ? (initMutationRate * (1 - (double) p.generation / maxGeneration) + 0.01) // scale mutation rate
-                        : initMutationRate;
+                if (scaleMutationRate) {
+                    standardabweichung = p.getStandardabweichung();
+                    // Mehr Mutation wenn die Standardabweichung niedrig ist
+                    mutationRate = initMutationRate * (1 / (standardabweichung + 1));
+                } else {
+                    mutationRate = initMutationRate;
+                }
+                // mutationRate = scaleMutationRate
+                // ? (initMutationRate * (1 - (double) p.generation / maxGeneration) + 0.01) //
+                // scale mutation rate
+                // // from high to low
+
+                // : initMutationRate;
                 anzahlMutationen = p.mutation(mutationRate);
             }
             if (tunierSelection) {
@@ -199,8 +211,9 @@ public class HP {
             }
 
             avgFitness = p.evaluation();
-            addStatistik(avgFitness, mutationRate, anzahlMutationen);
+            addStatistik(avgFitness, mutationRate, anzahlMutationen, standardabweichung);
         }
+        p.exportBestAsImage();
         // addStatistik(avgFitness, );
         System.out.println("Sequenz: " + seq);
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
@@ -216,7 +229,8 @@ public class HP {
         }
     }
 
-    private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen) {
+    private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen,
+            double standardabweichung) {
         String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
                 "" + p.bestFolding.getFitness(),
                 "" + p.besteFitnessOverAll,
@@ -226,6 +240,7 @@ public class HP {
                 "" + p.anzahlOverlapsOverAll,
                 "" + mutationRate,
                 "" + anzahlMutationen,
+                "" + standardabweichung,
                 "" + p.getDiversity(),
                 "" + RelDir.toString(p.bestFolding.getDirections()),
                 "" + p.bestFolding.toString() };

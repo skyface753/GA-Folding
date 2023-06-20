@@ -253,4 +253,20 @@ class Population {
         return this.foldingPopulation.size();
     }
 
+    // Varianz der Fitness-Werte
+    private double getVarianz() {
+        double varianz = 0;
+        for (Folding folding : this.foldingPopulation) {
+            varianz += Math.pow(folding.getFitness() - avgFitness, 2);
+        }
+        varianz = varianz / this.foldingPopulation.size();
+        return varianz;
+    }
+
+    // Standardabweichung der Fitness-Werte
+    public double getStandardabweichung() {
+        double varianz = getVarianz();
+        double sd = Math.sqrt(varianz);
+        return sd;
+    }
 }
