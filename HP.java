@@ -109,14 +109,14 @@ public class HP {
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
             double mutationRate, boolean scaleMutationRate, boolean tunierSelection, boolean withSigmaScaling,
             boolean withElitism) {
-        // String SEQ20 = "10100110100101100101";
-        // String SEQ24 = "110010010010010010010011";
+        String SEQ20 = "10100110100101100101";
+        String SEQ24 = "110010010010010010010011";
         String SEQ25 = "0010011000011000011000011";
-        // String SEQ36 = "000110011000001111111001100001100100";
-        // String SEQ48 = "001001100110000011111111110000001100110010011111";
-        // String SEQ50 = "11010101011110100010001000010001000101111010101011";
-        // String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
-        String[] seqs = { SEQ25 };
+        String SEQ36 = "000110011000001111111001100001100100";
+        String SEQ48 = "001001100110000011111111110000001100110010011111";
+        String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        // String[] seqs = { SEQ25 };
         for (String seq : seqs) {
             genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, scaleMutationRate,
                     tunierSelection, withSigmaScaling, withElitism, seq);
@@ -170,9 +170,12 @@ public class HP {
                         "BestOverlaps", "HydroContactsOverAll", "OverlapsOverAll",
                         "MutationRate",
                         "AnzahlMutationen",
-                        "Standardabweichung",
-                        "Diversity", "BestDirections",
-                        "BestSequenz" }); // csv
+                        // "Standardabweichung",
+                        "Diversity",
+                        "BestFolding",
+                // "BestSequenz"
+
+                }); // csv
         // header
         double mutationRate = initMutationRate;
         if (!withCrossAndMutation) {
@@ -180,6 +183,10 @@ public class HP {
         }
         int anzahlMutationen = 0;
         double standardabweichung = 0;
+        boolean useDiversityAsMutationRate = true;
+
+        avgFitness = p.evaluation();
+        addStatistik(avgFitness, 0, 0, standardabweichung);
         while (avgFitness < 45 &&
                 p.generation < maxGeneration) {
 
@@ -190,9 +197,17 @@ public class HP {
             if (withCrossAndMutation) {
                 p.crossover();
                 if (scaleMutationRate) {
-                    standardabweichung = p.getStandardabweichung();
-                    // Mehr Mutation wenn die Standardabweichung niedrig ist
-                    mutationRate = initMutationRate * (1 / (standardabweichung + 1));
+                    if (useDiversityAsMutationRate) {
+                        double diversity = p.getDiversity();
+                        diversity = diversity / populationSize;
+                        mutationRate = initMutationRate * (1 / (diversity + 1));
+                        mutationRate /= 2;
+                    } else {
+                        standardabweichung = p.getStandardabweichung();
+                        // Mehr Mutation wenn die Standardabweichung niedrig ist
+                        mutationRate = initMutationRate * (1 / (standardabweichung + 1));
+                        mutationRate /= 2;
+                    }
                 } else {
                     mutationRate = initMutationRate;
                 }
@@ -204,14 +219,14 @@ public class HP {
                 // : initMutationRate;
                 anzahlMutationen = p.mutation(mutationRate);
             }
+            avgFitness = p.evaluation();
+            addStatistik(avgFitness, mutationRate, anzahlMutationen, standardabweichung);
             if (tunierSelection) {
                 p = p.turnierSelection(withElitism); // turnier selection
             } else {
                 p = p.selection(withSigmaScaling, withElitism); // fitness proportional selection
             }
 
-            avgFitness = p.evaluation();
-            addStatistik(avgFitness, mutationRate, anzahlMutationen, standardabweichung);
         }
         p.exportBestAsImage();
         // addStatistik(avgFitness, );
@@ -219,31 +234,39 @@ public class HP {
         System.out.println("Durchschnittliche Fitness: " + avgFitness);
         System.out.println("Beste Fitness: " + p.bestFolding.getFitness());
         System.out.println("Beste Directions: " + RelDir.toString(p.bestFolding.getDirections()));
-        System.out.println("Beste Sequenz: " + p.bestFolding.toString());
-        System.out.println("----------------------");
+        // System.out.println("Beste Sequenz: " + p.bestFolding.toString());
 
         try {
             givenDataArray_whenConvertToCSV_thenOutputCreated(); // write csv file
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("----------------------");
     }
 
     private void addStatistik(double avgFitness, double mutationRate, int anzahlMutationen,
             double standardabweichung) {
-        String[] newLine = new String[] { "" + p.generation, "" + avgFitness,
-                "" + p.bestFolding.getFitness(),
-                "" + p.besteFitnessOverAll,
+        String[] newLine = new String[] { "" + p.generation, "" +
+                // Avg to 2 decimal places
+                // avgFitness,
+                String.format("%.2f", avgFitness),
+                // "" + p.bestFolding.getFitness(),
+                String.format("%.2f", p.bestFolding.getFitness()),
+                // "" + p.besteFitnessOverAll,
+                String.format("%.2f", p.besteFitnessOverAll),
                 "" + p.bestFolding.getHydroContacts(),
                 "" + p.bestFolding.getOverlaps(),
                 "" + p.anzahlHydroContactsOverAll,
                 "" + p.anzahlOverlapsOverAll,
-                "" + mutationRate,
+                // "" + mutationRate,
+                String.format("%.2f", mutationRate),
                 "" + anzahlMutationen,
-                "" + standardabweichung,
+                // "" + standardabweichung,
                 "" + p.getDiversity(),
                 "" + RelDir.toString(p.bestFolding.getDirections()),
-                "" + p.bestFolding.toString() };
+                // "" + p.bestFolding.toString()
+
+        };
         dataLines.add(newLine);
     }
 }

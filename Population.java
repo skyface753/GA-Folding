@@ -49,8 +49,13 @@ class Population {
 
     public int getDiversity() {
         Set<String> set = new HashSet<String>();
+        String eelDir = "";
         for (Folding folding : this.foldingPopulation) {
-            set.add(folding.toString());
+            // set.add(folding.toString());
+            eelDir = RelDir.toString(folding.getDirections());
+            // Cut the first one, because its not necessary, in which direction the first
+            // node starts
+            set.add(eelDir.substring(1));
         }
         return set.size();
     }

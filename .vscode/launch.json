@@ -16,7 +16,8 @@
       "name": "HP",
       "request": "launch",
       "mainClass": "HP",
-      "projectName": "GA-Praktikum_3b0f189e"
+      "projectName": "GA-Praktikum_3b0f189e",
+      "args": "--image false --generations 100 --population 100 --scalemutate true --tunier true --mutationrate 0.1"
     },
     {
       "type": "java",
