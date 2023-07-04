@@ -20,8 +20,7 @@ public class HP {
 
     public static void main(String[] args) {
         HP hp = new HP();
-        String datetime = java.time.LocalDateTime.now().toString().replace(":", "-").replace(".", "-");
-        HP.outputFolderPrefix = HP.outputFolderPrefix + datetime + "/";
+
         boolean withCrossAndMutation = true;
         boolean imageOutput = false;
         int anzahlGenerationen = 100;
@@ -103,19 +102,30 @@ public class HP {
 
     public HP() {
         p = new Population();
+        // String datetime = java.time.LocalDateTime.now().toString().replace(":",
+        // "-").replace(".", "-");
+        // HP.outputFolderPrefix = HP.outputFolderPrefix + datetime + "/";
+        // Folder to current directory
+        HP.outputFolderPrefix = System.getProperty("user.dir") + "/output/";
 
     }
 
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
             double mutationRate, boolean scaleMutationRate, boolean tunierSelection, boolean withSigmaScaling,
             boolean withElitism) {
-        String SEQ20 = "10100110100101100101";
-        String SEQ24 = "110010010010010010010011";
-        String SEQ25 = "0010011000011000011000011";
-        String SEQ36 = "000110011000001111111001100001100100";
-        String SEQ48 = "001001100110000011111111110000001100110010011111";
-        String SEQ50 = "11010101011110100010001000010001000101111010101011";
-        String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        // String SEQ20 = "10100110100101100101";
+        // String SEQ24 = "110010010010010010010011";
+        // String SEQ25 = "0010011000011000011000011";
+        // String SEQ36 = "000110011000001111111001100001100100";
+        // String SEQ48 = "001001100110000011111111110000001100110010011111";
+        // String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        // String SEQ60 =
+        // "001110111111110001111111111010001111111111110000111111011010";
+
+        String SEQ64 = "1111111111110101001100110010011001100100110011001010111111111111";
+
+        // String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        String[] seqs = { SEQ64 };
         // String[] seqs = { SEQ25 };
         for (String seq : seqs) {
             genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, scaleMutationRate,
@@ -156,7 +166,7 @@ public class HP {
             boolean tunierSelection, boolean withSigmaScaling,
             boolean withElitism,
             String seq) {
-        HP.outputFolder = outputFolderPrefix + seq + "/";
+        HP.outputFolder = outputFolderPrefix;
         new File(outputFolder).mkdirs();
 
         // int populationSize = 100;
@@ -248,12 +258,12 @@ public class HP {
             double standardabweichung) {
         String[] newLine = new String[] { "" + p.generation, "" +
                 // Avg to 2 decimal places
-                // avgFitness,
-                String.format("%.2f", avgFitness),
-                // "" + p.bestFolding.getFitness(),
-                String.format("%.2f", p.bestFolding.getFitness()),
-                // "" + p.besteFitnessOverAll,
-                String.format("%.2f", p.besteFitnessOverAll),
+                avgFitness,
+                // String.format("%.2f", avgFitness),
+                "" + p.bestFolding.getFitness(),
+                // String.format("%.2f", p.bestFolding.getFitness()),
+                "" + p.besteFitnessOverAll,
+                // String.format("%.2f", p.besteFitnessOverAll),
                 "" + p.bestFolding.getHydroContacts(),
                 "" + p.bestFolding.getOverlaps(),
                 "" + p.anzahlHydroContactsOverAll,
