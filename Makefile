@@ -1,3 +1,5 @@
+start: build run
+
 build:
 	javac -d . *.java Helpers/*.java
 	jar -cvf BuildedFile.jar *.class Helpers/*.class
@@ -23,6 +25,7 @@ run-test-all-params-changed: lib1.a
 clean:
 	rm -rf *.class Helpers/*.class BuildedFile.jar
 	rm -rf /tmp/ga/*
+	rm -rf ./Output/*
 
 lib1.a: relay
 

@@ -113,23 +113,23 @@ public class HP {
     public void test(boolean withCrossAndMutation, boolean imageOutput, int maxGeneration, int populationSize,
             double mutationRate, boolean scaleMutationRate, boolean tunierSelection, boolean withSigmaScaling,
             boolean withElitism) {
-        // String SEQ20 = "10100110100101100101";
-        // String SEQ24 = "110010010010010010010011";
-        // String SEQ25 = "0010011000011000011000011";
-        // String SEQ36 = "000110011000001111111001100001100100";
-        // String SEQ48 = "001001100110000011111111110000001100110010011111";
-        // String SEQ50 = "11010101011110100010001000010001000101111010101011";
-        // String SEQ60 =
-        // "001110111111110001111111111010001111111111110000111111011010";
+        String SEQ20 = "10100110100101100101";
+        String SEQ24 = "110010010010010010010011";
+        String SEQ25 = "0010011000011000011000011";
+        String SEQ36 = "000110011000001111111001100001100100";
+        String SEQ48 = "001001100110000011111111110000001100110010011111";
+        String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        String SEQ60 = "001110111111110001111111111010001111111111110000111111011010";
 
         String SEQ64 = "1111111111110101001100110010011001100100110011001010111111111111";
 
-        // String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
-        String[] seqs = { SEQ64 };
+        String[] seqs = { SEQ20, SEQ24, SEQ25, SEQ36, SEQ48, SEQ50 };
+        // String[] seqs = { SEQ64 };
         // String[] seqs = { SEQ25 };
         for (String seq : seqs) {
             genAlgo(withCrossAndMutation, imageOutput, maxGeneration, populationSize, mutationRate, scaleMutationRate,
                     tunierSelection, withSigmaScaling, withElitism, seq);
+
         }
     }
 
